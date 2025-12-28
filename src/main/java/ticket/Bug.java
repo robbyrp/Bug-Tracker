@@ -1,5 +1,6 @@
 package ticket;
 
+import lombok.Setter;
 import ticket.enums.Frequency;
 import ticket.enums.Severity;
 
@@ -12,7 +13,7 @@ public final class Bug extends Ticket{
 
     // Optional fields
     private String environment;
-    private int errorCode;
+    private Integer errorCode; // Wrapper so that i can check if bug.errorcode != null
 
 
     private Bug(BugBuilder builder) {
@@ -31,7 +32,7 @@ public final class Bug extends Ticket{
 
         // Optional fields
         private String environment;
-        private int errorCode;
+        private Integer errorCode;
 
         @Override
         protected BugBuilder self() {
@@ -68,7 +69,7 @@ public final class Bug extends Ticket{
             return self();
         }
 
-        public BugBuilder errorCode(final int errorCode) {
+        public BugBuilder errorCode(final Integer errorCode) {
             this.errorCode = errorCode;
             return self();
         }

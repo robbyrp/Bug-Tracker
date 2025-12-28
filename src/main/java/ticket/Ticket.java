@@ -7,7 +7,7 @@ import ticket.enums.Status;
 public abstract class Ticket {
 
     protected int id;
-    protected  String type;
+    protected String type;
     protected String title;
     protected BusinessPriority businessPriority;
     protected Status status;

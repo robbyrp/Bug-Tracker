@@ -1,0 +1,29 @@
+package ticket.enums;
+
+import ticket.Ticket;
+
+public enum TicketType {
+    BUG("BUG"),
+    UI_FEEDBACK("UI_FEEDBACK"),
+    FEATURE_REQUEST("FEATURE_REQUEST"),
+    UNKNOWN("UNKNOWN")
+    ;
+    public final String text;
+
+    TicketType(final String text) {
+        this.text = text;
+    }
+
+    public static TicketType fromString(final String text) throws IllegalArgumentException {
+        if (text == null) {
+            throw new IllegalArgumentException("TicketType from TicketInput "+
+                    "does not match Enum Identifier");
+        }
+        for (TicketType t : TicketType.values()) {
+            if (t.name().equalsIgnoreCase(text)) {
+                return t;
+            }
+        }
+        return UNKNOWN;
+    }
+}
