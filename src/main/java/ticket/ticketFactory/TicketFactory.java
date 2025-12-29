@@ -48,7 +48,7 @@ public final class TicketFactory {
                 break;
 
             default:
-                throw new IllegalArgumentException("UNKNOWN TICKET TYPE" + input.getType());
+                throw new IllegalArgumentException("Unknown ticket type" + input.getType());
 
         }
 

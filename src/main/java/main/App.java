@@ -1,8 +1,13 @@
 package main;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import fileio.CommandInput;
+import fileio.InputLoader;
+import fileio.UserInput;
+import user.User;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,21 +35,24 @@ public class App {
      * @param outputPath path to the file where results should be written
      */
     public static void run(final String inputPath, final String outputPath) {
-        // feel free to change this if needed
         // however keep 'outputs' variable name to be used for writing
+        ObjectMapper mapper = new ObjectMapper();
         List<ObjectNode> outputs = new ArrayList<>();
 
-        /*
-            TODO 1 :
-            Load initial user data and commands. we strongly recommend using jackson library.
-            you can use the reading from hw1 as a reference.
-            however you can use some of the more advanced features of
-            jackson library, available here: https://www.baeldung.com/jackson-annotations
-        */
+        try {
+            ArrayList<UserInput> users = mapper.readValue(
+                    new File(INPUT_USERS_FIELD),
+                    new TypeReference<ArrayList<UserInput>>() {}
+            );
 
-        // TODO 2: process commands.
+            InputLoader inputLoader = new InputLoader(inputPath);
+            List<CommandInput> commands = inputLoader.getCommands();
 
-        // TODO 3: create objectnodes for output, add them to outputs list.
+
+            // TODO: Process commands here;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         // DO NOT CHANGE THIS SECTION IN ANY WAY
         try {

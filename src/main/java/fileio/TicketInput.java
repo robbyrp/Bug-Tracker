@@ -2,10 +2,9 @@ package fileio;
 
 import lombok.Getter;
 import lombok.Setter;
-import ticket.enums.*;
 
 @Setter @Getter
-public class TicketInput {
+public final class TicketInput {
     private int id;
     private  String type;
     private String title;
