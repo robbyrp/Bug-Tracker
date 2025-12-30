@@ -1,20 +1,20 @@
 package ticket;
 
-import ticket.enums.BusinessValue;
-import ticket.enums.CustomerDemand;
+import enums.BusinessValue;
+import enums.CustomerDemand;
 
 public final class FeatureRequest extends Ticket {
 
     private BusinessValue businessValue;
     private CustomerDemand customerDemand;
 
-    private FeatureRequest(FeatureRequestBuilder builder) {
+    private FeatureRequest(final FeatureRequestBuilder builder) {
         super(builder);
         this.businessValue = builder.businessValue;
         this.customerDemand = builder.customerDemand;
     }
 
-    public static class FeatureRequestBuilder extends Ticket.Builder<FeatureRequestBuilder> {
+    public final static class FeatureRequestBuilder extends Ticket.Builder<FeatureRequestBuilder> {
         private BusinessValue businessValue;
         private CustomerDemand customerDemand;
 
@@ -28,14 +28,28 @@ public final class FeatureRequest extends Ticket {
             return new FeatureRequest(this);
         }
 
-        public FeatureRequestBuilder businessValue(final BusinessValue businessValue) {
-            this.businessValue = businessValue;
+        /**
+         *
+         * @param businessValues
+         * @return
+         */
+        public FeatureRequestBuilder businessValue(final BusinessValue businessValues) {
+            this.businessValue = businessValues;
             return self();
         }
 
-        public FeatureRequestBuilder customerDemand(final CustomerDemand customerDemand) {
-            this.customerDemand = customerDemand;
+        /**
+         *
+         * @param customerDemands
+         * @return
+         */
+        public FeatureRequestBuilder customerDemand(final CustomerDemand customerDemands) {
+            this.customerDemand = customerDemands;
             return self();
+        }
+
+        public boolean canBeAnonymous() {
+            return false;
         }
 
     }

@@ -3,7 +3,8 @@ package user;
 import fileio.UserInput;
 import lombok.Getter;
 import lombok.Setter;
-import ticket.enums.ExpertiseArea;
+import enums.ExpertiseArea;
+import enums.Seniority;
 
 @Getter @Setter
 public final class Developer extends User {
@@ -17,4 +18,5 @@ public final class Developer extends User {
         this.expertiseArea = ExpertiseArea.fromString(input.getExpertiseArea());
         this.seniority = Seniority.fromString(input.getSeniority());
     }
+
 }

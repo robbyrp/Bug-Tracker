@@ -1,9 +1,4 @@
-package user;
-
-import ticket.enums.BusinessPriority;
-import ticket.enums.ExpertiseArea;
-import ticket.enums.TicketType;
-
+package enums;
 
 import java.util.Set;
 
@@ -24,9 +19,7 @@ public enum Seniority {
     UNKNOWN(
             Set.of(BusinessPriority.UNKNOWN),
             Set.of(TicketType.UNKNOWN)
-    )
-
-    ;
+    );
     private final Set<BusinessPriority> allowedPriorities;
     private final Set<TicketType> allowedTypes;
 
@@ -36,17 +29,34 @@ public enum Seniority {
         this.allowedTypes = allowedTypes;
     }
 
+    /**
+     *
+     * @param businessPriority
+     * @return The allowed priorities
+     */
     public boolean hasAccessToPriority(final BusinessPriority businessPriority) {
         return allowedPriorities.contains(businessPriority);
     }
 
+    /**
+     *
+     * @param ticketType
+     * @return returns the allowed types of tickets
+     */
     public boolean hasAccessToTicketType(final TicketType ticketType) {
         return allowedTypes.contains(ticketType);
     }
 
+    /**
+     * Matches parameter to enum identifier
+     * @param text
+     * @return
+     * @throws IllegalArgumentException
+     */
     public static Seniority fromString(final String text) throws IllegalArgumentException {
         if (text == null) {
-            throw new IllegalArgumentException("Seniority from UserInput does not match Enum Identifier");
+            throw new IllegalArgumentException("Seniority from UserInput"
+                    + " does not match Enum Identifier");
         }
         for (Seniority s : Seniority.values()) {
             if (s.name().equalsIgnoreCase(text)) {

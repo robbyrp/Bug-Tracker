@@ -1,4 +1,6 @@
-package ticket.enums;
+package enums;
+
+import lombok.Getter;
 
 import java.util.Set;
 
@@ -9,22 +11,34 @@ public enum ExpertiseArea {
     DEVOPS(Set.of("DEVOPS")),
     DESIGN(Set.of("DESIGN", "FRONTEND")),
     DB(Set.of("DB")),
-    UNKNOWN(Set.of("UNKNOWN"))
-    ;
+    UNKNOWN(Set.of("UNKNOWN"));
 
-    public final Set<String> accessibleZones;
+    @Getter
+    private final Set<String> accessibleZones;
 
     ExpertiseArea(final Set<String> accessibleZones) {
         this.accessibleZones = accessibleZones;
     }
 
+    /**
+     *
+     * @param zone
+     * @return Accesible zones for devs
+     */
     public boolean hasAccessToZone(final String zone) {
         return accessibleZones.contains(zone);
     }
 
+    /**
+     * Matches parameter to enum identifier
+     * @param text
+     * @return
+     * @throws IllegalArgumentException
+     */
     public static ExpertiseArea fromString(final String text) {
         if (text == null) {
-            throw new IllegalArgumentException("Role from UserInput does not match Enum Identifier");
+            throw new IllegalArgumentException("Role from UserInput does"
+                    + " not match Enum Identifier");
         }
 
         for (ExpertiseArea ea : ExpertiseArea.values()) {

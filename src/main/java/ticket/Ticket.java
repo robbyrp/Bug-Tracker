@@ -1,11 +1,14 @@
 package ticket;
 
-import ticket.enums.BusinessPriority;
-import ticket.enums.ExpertiseArea;
-import ticket.enums.Status;
+import enums.BusinessPriority;
+import enums.ExpertiseArea;
+import enums.Status;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter @Setter
 public abstract class Ticket {
-
     protected int id;
     protected String type;
     protected String title;
@@ -17,7 +20,7 @@ public abstract class Ticket {
     // Optional fields
     protected String description;
 
-    protected Ticket (Builder b) {
+    protected Ticket(final Builder b) {
         this.id = b.id;
         this.type = b.type;
         this.title = b.title;
@@ -45,49 +48,95 @@ public abstract class Ticket {
          * the unchecked cast of (T) this;
          * @return the child's inner builder class, for example Bug.BugBuilder
          */
-        protected abstract T self() ;
+        protected abstract T self();
 
-        public T id(final int id){
-            this.id = id;
+        /**
+         *
+         * @param ids
+         * @return
+         */
+        public T id(final int ids) {
+            this.id = ids;
             return self();
         }
 
-        public T type(final String type) {
-            this.type = type;
+        /**
+         *
+         * @param types
+         * @return
+         */
+        public T type(final String types) {
+            this.type = types;
             return self();
         }
 
-        public T title(final String title) {
-            this.title = title;
+        /**
+         *
+         * @param titles
+         * @return
+         */
+        public T title(final String titles) {
+            this.title = titles;
             return self();
         }
 
-        public T businessPriority(final BusinessPriority bp) {
-            this.businessPriority = bp;
+        /**
+         *
+         * @param bps
+         * @return
+         */
+        public T businessPriority(final BusinessPriority bps) {
+            this.businessPriority = bps;
             return self();
         }
 
-        public T status(final Status status) {
-            this.status = status;
+        /**
+         *
+         * @param statuss
+         * @return
+         */
+        public T status(final Status statuss) {
+            this.status = statuss;
             return self();
         }
 
-        public T expertiseArea(final ExpertiseArea expertiseArea) {
-            this.expertiseArea = expertiseArea;
+        /**
+         *
+         * @param expertiseAreas
+         * @return
+         */
+        public T expertiseArea(final ExpertiseArea expertiseAreas) {
+            this.expertiseArea = expertiseAreas;
             return self();
         }
 
-        public T reportedBy(final String reportedBy) {
-            this.reportedBy = reportedBy;
+        /**
+         *
+         * @param reportedBys
+         * @return
+         */
+        public T reportedBy(final String reportedBys) {
+            this.reportedBy = reportedBys;
             return self();
         }
 
-        public T description(final String description) {
-            this.description = description;
+        /**
+         *
+         * @param descriptions
+         * @return
+         */
+        public T description(final String descriptions) {
+            this.description = descriptions;
             return self();
         }
 
+        /**
+         * builds the ticket's child object
+         * @return
+         */
         public abstract Ticket build() ;
+
+        public abstract boolean canBeAnonymous();
 
 
     }

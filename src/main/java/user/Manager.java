@@ -14,4 +14,5 @@ public final class Manager extends User {
         this.hireDate = input.getHireDate();
         this.subordinates = input.getSubordinates();
     }
+
 }

@@ -1,11 +1,11 @@
 package ticket.ticketFactory;
 
+import enums.*;
 import fileio.TicketInput;
 import ticket.Bug;
 import ticket.FeatureRequest;
 import ticket.Ticket;
 import ticket.UiRequest;
-import ticket.enums.*;
 
 //TODO: ASSIGN ID'S BASED ON SOMETHING
 

@@ -14,7 +14,7 @@ public final class FilterInput {
 
     private String[] keywords; //TODO: Fa-l case insensitive si mai verifica cerinta
     private String expertiseArea;
-    private String Seniority;
+    private String seniority;
     private Integer performanceScoreAbove;
     private Integer performanceScoreBelow;
 }

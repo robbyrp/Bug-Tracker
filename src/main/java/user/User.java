@@ -3,9 +3,10 @@ package user;
 import fileio.UserInput;
 import lombok.Getter;
 import lombok.Setter;
+import enums.Role;
 
 @Getter @Setter
-public class User {
+public abstract class User {
     private String username;
     private String email;
     private Role role;

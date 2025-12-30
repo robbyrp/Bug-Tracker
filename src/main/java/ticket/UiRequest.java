@@ -1,6 +1,6 @@
 package ticket;
 
-import ticket.enums.BusinessValue;
+import enums.BusinessValue;
 
 public final class UiRequest extends Ticket {
 
@@ -12,13 +12,13 @@ public final class UiRequest extends Ticket {
     private String screenshotUrl;
     private String suggestedFix;
 
-    private UiRequest(UiRequestBuilder builder) {
+    private UiRequest(final UiRequestBuilder builder) {
         super(builder);
         this.businessValue = builder.businessValue;
         this.usabilityScore = builder.usabilityScore;
     }
 
-    public static class UiRequestBuilder extends Ticket.Builder<UiRequestBuilder> {
+    public final static class UiRequestBuilder extends Ticket.Builder<UiRequestBuilder> {
         private BusinessValue businessValue;
         private int usabilityScore;
 
@@ -37,29 +37,58 @@ public final class UiRequest extends Ticket {
             return new UiRequest(this);
         }
 
-        public UiRequestBuilder businessValue(final BusinessValue businessValue) {
-            this.businessValue = businessValue;
+        /**
+         *
+         * @param businessValues
+         * @return
+         */
+        public UiRequestBuilder businessValue(final BusinessValue businessValues) {
+            this.businessValue = businessValues;
             return self();
         }
 
-        public UiRequestBuilder usabilityScore(final int usabilityScore) {
-            this.usabilityScore = usabilityScore;
+        /**
+         *
+         * @param usabilityScores
+         * @return
+         */
+        public UiRequestBuilder usabilityScore(final int usabilityScores) {
+            this.usabilityScore = usabilityScores;
             return self();
         }
 
-        public UiRequestBuilder uiElementId(final String uiElementId) {
-            this.uiElementId = uiElementId;
+        /**
+         *
+         * @param uiElementIds
+         * @return
+         */
+        public UiRequestBuilder uiElementId(final String uiElementIds) {
+            this.uiElementId = uiElementIds;
             return self();
         }
 
-        public UiRequestBuilder screenshotUrl(final String screenshotUrl) {
-            this.screenshotUrl = screenshotUrl;
+        /**
+         *
+         * @param screenshotUrls
+         * @return
+         */
+        public UiRequestBuilder screenshotUrl(final String screenshotUrls) {
+            this.screenshotUrl = screenshotUrls;
             return self();
         }
 
-        public UiRequestBuilder suggestedFix(final String suggestedFix) {
-            this.suggestedFix = suggestedFix;
+        /**
+         *
+         * @param suggestedFixs
+         * @return
+         */
+        public UiRequestBuilder suggestedFix(final String suggestedFixs) {
+            this.suggestedFix = suggestedFixs;
             return self();
+        }
+
+        public boolean canBeAnonymous() {
+            return false;
         }
     }
 }

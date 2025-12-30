@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import fileio.CommandInput;
 import fileio.InputLoader;
 import fileio.UserInput;
-import user.User;
+import lombok.NoArgsConstructor;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,9 +18,8 @@ import java.util.List;
  * main.App represents the main application logic that processes input commands,
  * generates outputs, and writes them to a file
  */
-public class App {
-    private App() {
-    }
+@NoArgsConstructor
+public final class App {
 
     private static final String INPUT_USERS_FIELD = "input/database/users.json";
 
@@ -40,13 +39,18 @@ public class App {
         List<ObjectNode> outputs = new ArrayList<>();
 
         try {
-            ArrayList<UserInput> users = mapper.readValue(
+            ArrayList<UserInput> userInputs = mapper.readValue(
                     new File(INPUT_USERS_FIELD),
-                    new TypeReference<ArrayList<UserInput>>() {}
+                    new TypeReference<ArrayList<UserInput>>() { }
             );
 
             InputLoader inputLoader = new InputLoader(inputPath);
             List<CommandInput> commands = inputLoader.getCommands();
+            BugTrackerSystem system = new BugTrackerSystem();
+
+            system.getUserDatabase().initialize(userInputs);
+
+            system.executeCommands(commands, outputs);
 
 
             // TODO: Process commands here;

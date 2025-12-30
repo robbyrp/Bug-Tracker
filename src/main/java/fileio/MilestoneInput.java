@@ -1,7 +1,5 @@
 package fileio;
 
-import java.time.LocalDate;
-
 public class MilestoneInput {
     private String name;
     private String[] blockingFor;

@@ -2,9 +2,6 @@ package fileio;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ticket.enums.ExpertiseArea;
-import user.Role;
-import user.Seniority;
 
 @Data
 @NoArgsConstructor
