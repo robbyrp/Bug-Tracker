@@ -37,8 +37,7 @@ public enum ExpertiseArea {
      */
     public static ExpertiseArea fromString(final String text) {
         if (text == null) {
-            throw new IllegalArgumentException("Role from UserInput does"
-                    + " not match Enum Identifier");
+            return null;
         }
 
         for (ExpertiseArea ea : ExpertiseArea.values()) {
@@ -46,6 +45,7 @@ public enum ExpertiseArea {
                 return ea;
             }
         }
-        return UNKNOWN;
+        throw new IllegalArgumentException("Role from UserInput does"
+                + " not match Enum Identifier");
     }
 }

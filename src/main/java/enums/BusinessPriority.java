@@ -22,15 +22,15 @@ public enum BusinessPriority {
      */
     public static BusinessPriority fromString(final String text) throws IllegalArgumentException {
         if (text == null) {
-            throw new IllegalArgumentException("BusinessPriority from TicketInput "
-                    + "does not match Enum Identifier");
+            return null;
         }
         for (BusinessPriority bp : BusinessPriority.values()) {
             if (bp.name().equalsIgnoreCase(text)) {
                 return bp;
             }
         }
-        return UNKNOWN;
+        throw new IllegalArgumentException("BusinessPriority from TicketInput "
+                + "does not match Enum Identifier");
     }
 
 }

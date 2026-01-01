@@ -55,14 +55,14 @@ public enum Seniority {
      */
     public static Seniority fromString(final String text) throws IllegalArgumentException {
         if (text == null) {
-            throw new IllegalArgumentException("Seniority from UserInput"
-                    + " does not match Enum Identifier");
+            return null;
         }
         for (Seniority s : Seniority.values()) {
             if (s.name().equalsIgnoreCase(text)) {
                 return s;
             }
         }
-        return UNKNOWN;
+        throw new IllegalArgumentException("Seniority from UserInput"
+                + " does not match Enum Identifier");
     }
 }

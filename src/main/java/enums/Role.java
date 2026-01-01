@@ -23,14 +23,14 @@ public enum Role {
      */
     public static Role fromString(final String text) throws IllegalArgumentException {
         if (text == null) {
-            throw new IllegalArgumentException("Role from UserInput "
-                    + "does not match Enum Identifier");
+           return null;
         }
         for (Role r : Role.values()) {
             if (r.name().equalsIgnoreCase(text)) {
                 return r;
             }
         }
-        return UNKNOWN;
+        throw new IllegalArgumentException("Role from UserInput "
+                + "does not match Enum Identifier");
     }
 }

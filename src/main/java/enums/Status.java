@@ -21,14 +21,14 @@ public enum Status {
      */
     public static Status fromString(final String text) throws IllegalArgumentException {
         if (text == null) {
-            throw new IllegalArgumentException("Status from TicketInput "
-                    + "does not match Enum Identifier");
+            return null;
         }
         for (Status s : Status.values()) {
             if (s.name().equalsIgnoreCase(text)) {
                 return s;
             }
         }
-        return UNKNOWN;
+        throw new IllegalArgumentException("Status from TicketInput "
+                + "does not match Enum Identifier");
     }
 }

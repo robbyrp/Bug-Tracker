@@ -23,14 +23,14 @@ public enum CustomerDemand {
      */
     public static CustomerDemand fromString(final String text) throws IllegalArgumentException {
         if (text == null) {
-            throw new IllegalArgumentException("CustomerDemand from TicketInput does"
-                    + " not match Enum Identifier");
+            return null;
         }
         for (CustomerDemand cd : CustomerDemand.values()) {
             if (cd.name().equalsIgnoreCase(text)) {
                 return cd;
             }
         }
-        return UNKNOWN;
+        throw new IllegalArgumentException("CustomerDemand from TicketInput does"
+                + " not match Enum Identifier");
     }
 }

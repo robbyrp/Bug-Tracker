@@ -3,7 +3,7 @@ package command;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import enums.BusinessPriority;
 import enums.Status;
-import enums.TicketType;
+import enums.Role;
 import fileio.CommandInput;
 import fileio.OutputFormatter;
 import fileio.TicketInput;
@@ -19,9 +19,14 @@ public final class ReportTicketCommand implements Command {
     private CommandInput input;
     private User user;
 
-    public ReportTicketCommand(final CommandInput input, final User user) {
+    public ReportTicketCommand(final CommandInput input, final User users) {
         this.input = input;
-        this.user = user;
+        this.user = users;
+    }
+
+    @Override
+    public List<Role> getRequiredRoles() {
+        return List.of(Role.REPORTER);
     }
 
     @Override

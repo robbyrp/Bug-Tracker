@@ -23,14 +23,14 @@ public enum BusinessValue {
      */
     public static BusinessValue fromString(final String text) throws IllegalArgumentException {
         if (text == null) {
-            throw new IllegalArgumentException("BusinessValue from TicketInput "
-                    + "does not match Enum Identifier");
+            return null;
         }
         for (BusinessValue bv : BusinessValue.values()) {
             if (bv.name().equalsIgnoreCase(text)) {
                 return bv;
             }
         }
-        return UNKNOWN;
+        throw new IllegalArgumentException("BusinessValue from TicketInput "
+                + "does not match Enum Identifier");
     }
 }

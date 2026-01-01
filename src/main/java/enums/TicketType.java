@@ -20,14 +20,14 @@ public enum TicketType {
      */
     public static TicketType fromString(final String text) throws IllegalArgumentException {
         if (text == null) {
-            throw new IllegalArgumentException("TicketType from TicketInput "
-                    + "does not match Enum Identifier");
+            return null;
         }
         for (TicketType t : TicketType.values()) {
             if (t.name().equalsIgnoreCase(text)) {
                 return t;
             }
         }
-        return UNKNOWN;
+        throw new IllegalArgumentException("TicketType from TicketInput "
+                + "does not match Enum Identifier");
     }
 }

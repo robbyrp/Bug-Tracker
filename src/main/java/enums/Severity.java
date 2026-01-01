@@ -19,14 +19,14 @@ public enum Severity {
      */
     public static Severity fromString(final String text) throws IllegalArgumentException {
         if (text == null) {
-            throw new IllegalArgumentException("Severity from TicketInput "
-                    + "does not match Enum Identifier");
+            return null;
         }
         for (Severity s : Severity.values()) {
             if (s.name().equalsIgnoreCase(text)) {
                 return s;
             }
         }
-        return UNKNOWN;
+        throw new IllegalArgumentException("Severity from TicketInput "
+                + "does not match Enum Identifier");
     }
 }

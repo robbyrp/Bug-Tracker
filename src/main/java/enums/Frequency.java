@@ -24,14 +24,14 @@ public enum Frequency {
      */
     public static Frequency fromString(final String text) throws IllegalArgumentException {
         if (text == null) {
-            throw new IllegalArgumentException("Frequency from TicketInput "
-                    + "does not match Enum Identifier");
+            return null;
         }
         for (Frequency f : Frequency.values()) {
             if (f.name().equalsIgnoreCase(text)) {
                 return f;
             }
         }
-        return UNKNOWN;
+        throw new IllegalArgumentException("Frequency from TicketInput "
+                + "does not match Enum Identifier");
     }
 }
