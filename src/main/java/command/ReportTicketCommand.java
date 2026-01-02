@@ -12,16 +12,14 @@ import ticket.Ticket;
 import ticket.ticketFactory.TicketFactory;
 import user.User;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
-public final class ReportTicketCommand implements Command {
-    private CommandInput input;
-    private User user;
+public final class ReportTicketCommand extends Command {
 
-    public ReportTicketCommand(final CommandInput input, final User users) {
-        this.input = input;
-        this.user = users;
+    public ReportTicketCommand(CommandInput input, User user) {
+        super(input, user);
     }
 
     @Override
@@ -32,24 +30,32 @@ public final class ReportTicketCommand implements Command {
     @Override
     public void execute(final BugTrackerSystem system, final List<ObjectNode> outputs) {
         //TODO: CHECK PENTRU DEPASIRE PERIOADA DE TESTARE SI RAPORTARE ANONIMA
-        TicketInput ticketInputParams = input.getParams();
+        TicketInput ticketInputParams = getInput().getParams();
 
         if (Objects.equals(ticketInputParams.getReportedBy(), "")) {
             if (!Objects.equals(ticketInputParams.getType(), "BUG")) {
                 String errorMessage = "Anonymous reports are only allowed for tickets of type BUG.";
-                outputs.add(OutputFormatter.createError(input.getCommand(), input.getUsername(),
-                        input.getTimestamp(), errorMessage));
+                outputs.add(OutputFormatter.createError(getInput().getCommand(), getInput().getUsername(),
+                        getInput().getTimestamp(), errorMessage));
                 return;
             }
         }
 
         Ticket newTicket = TicketFactory.createTicket(ticketInputParams);
+
         int newId = system.getTicketDatabase().getNextId();
         newTicket.setId(newId);
+
         newTicket.setStatus(Status.OPEN);
+
+        String ticketReportedTimestampString = getInput().getTimestamp();
+        LocalDate reportedTimestamp = LocalDate.parse(ticketReportedTimestampString);
+        newTicket.setReportedTimestamp(reportedTimestamp);
 
         if (Objects.equals(ticketInputParams.getReportedBy(), "")) {
             newTicket.setBusinessPriority(BusinessPriority.LOW);
         }
+
+        system.getTicketDatabase().addTicket(newTicket);
     }
 }

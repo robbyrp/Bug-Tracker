@@ -7,7 +7,6 @@ import ticket.FeatureRequest;
 import ticket.Ticket;
 import ticket.UiRequest;
 
-//TODO: ASSIGN ID'S BASED ON SOMETHING
 
 public final class TicketFactory {
     public static Ticket createTicket(final TicketInput input)
@@ -68,6 +67,8 @@ public final class TicketFactory {
                 .status(Status.fromString(input.getStatus()))
                 .expertiseArea(ExpertiseArea.fromString(input.getExpertiseArea()))
                 .reportedBy(input.getReportedBy())
-                .description(input.getDescription());
+                .description(input.getDescription())
+                .build();
+        //TODO: ADD A WAY FOR TICKET BUILDER TO BUILD  REPORTEDTIMESTAMP MEMBER
     }
 }

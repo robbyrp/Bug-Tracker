@@ -9,13 +9,10 @@ import user.User;
 
 import java.util.List;
 
-public final class LostInvestorsCommand implements Command {
-    public CommandInput input;
-    public User user;
+public final class LostInvestorsCommand extends Command {
 
-    public LostInvestorsCommand(final CommandInput input, final User users) {
-        this.input = input;
-        this.user = users;
+    public LostInvestorsCommand(CommandInput input, User user) {
+        super(input, user);
     }
 
     @Override

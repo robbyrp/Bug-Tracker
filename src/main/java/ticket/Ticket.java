@@ -1,11 +1,24 @@
 package ticket;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import enums.BusinessPriority;
 import enums.ExpertiseArea;
 import enums.Status;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter @Setter
 public abstract class Ticket {
@@ -14,10 +27,31 @@ public abstract class Ticket {
     protected String title;
     protected BusinessPriority businessPriority;
     protected Status status;
-    protected ExpertiseArea expertiseArea;
+
+    @JsonProperty("createdAt")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    protected LocalDate reportedTimestamp;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonSerialize(nullsUsing = EmptyStringSerializer.class)
+    protected LocalDate assignedAt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonSerialize(nullsUsing = EmptyStringSerializer.class)
+    protected LocalDate solvedAt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonSerialize(nullsUsing = EmptyStringSerializer.class)
+    protected String assignedTo = "";
+
     protected String reportedBy;
+    protected List<String> comments = new ArrayList<>();
+
+    @JsonIgnore
+    protected ExpertiseArea expertiseArea;
 
     // Optional fields
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     protected String description;
 
     protected Ticket(final Builder b) {
@@ -28,6 +62,7 @@ public abstract class Ticket {
         this.status = b.status;
         this.expertiseArea = b.expertiseArea;
         this.reportedBy = b.reportedBy;
+        this.reportedTimestamp = b.reportedTimestamp;
     }
 
     // T represents the future builder(inner class) of Ticket's children, for example Bug.BugBuilder
@@ -39,6 +74,7 @@ public abstract class Ticket {
         private Status status;
         private ExpertiseArea expertiseArea;
         private String reportedBy;
+        private LocalDate reportedTimestamp;
 
         // Optional fields
         private String description;
@@ -130,6 +166,11 @@ public abstract class Ticket {
             return self();
         }
 
+        public T reportedTimestamp (final LocalDate reportedTimestamps) {
+            this.reportedTimestamp = reportedTimestamps;
+            return self();
+        }
+
         /**
          * builds the ticket's child object
          * @return
@@ -138,7 +179,16 @@ public abstract class Ticket {
 
         public abstract boolean canBeAnonymous();
 
-
     }
 
+    /**
+     * Internal class that transforms a null object to ""
+     * For json output
+     */
+    public static class EmptyStringSerializer extends JsonSerializer<Object> {
+        @Override
+        public void serialize(Object value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+            gen.writeString("");
+        }
+    }
 }

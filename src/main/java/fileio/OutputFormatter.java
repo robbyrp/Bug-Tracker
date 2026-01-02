@@ -1,13 +1,22 @@
 package fileio;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.util.List;
 
 public final class OutputFormatter {
     private static final ObjectMapper mapper = new ObjectMapper();
 
+    /**
+     *
+     */
+    static {
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
     /**
      * Helper method for common header
      * @param command

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import command.Command;
 import command.LostInvestorsCommand;
 import command.ReportTicketCommand;
+import command.viewTickets.ViewTicketsCommand;
 import enums.Role;
 import exceptions.UserNoPermissionException;
 import fileio.CommandInput;
@@ -109,8 +110,8 @@ public final class BugTrackerSystem {
         switch (input.getCommand()) {
             case "reportTicket":
                 return new ReportTicketCommand(input, user);
-//            case "viewTickets":
-//                return new ViewTicketsCommand(input, user);
+            case "viewTickets":
+                return new ViewTicketsCommand(input, user);
 
             case "lostInvestors":
                 return new LostInvestorsCommand(input, user);
