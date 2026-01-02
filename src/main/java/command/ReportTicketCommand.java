@@ -1,6 +1,7 @@
 package command;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import enums.ApplicationPhase;
 import enums.BusinessPriority;
 import enums.Status;
 import enums.Role;
@@ -25,6 +26,11 @@ public final class ReportTicketCommand extends Command {
     @Override
     public List<Role> getRequiredRoles() {
         return List.of(Role.REPORTER);
+    }
+
+    @Override
+    public ApplicationPhase  getRequiredPhase() {
+        return ApplicationPhase.TESTING;
     }
 
     @Override

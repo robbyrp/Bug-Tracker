@@ -1,9 +1,6 @@
 package ticket;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -21,6 +18,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter @Setter
+@JsonPropertyOrder({
+        "id",
+        "type",
+        "title",
+        "businessPriority",
+        "status",
+        "createdAt",
+        "assignedAt",
+        "solvedAt",
+        "assignedTo",
+        "reportedBy",
+        "comments",
+        "description"
+})
 public abstract class Ticket {
     protected int id;
     protected String type;

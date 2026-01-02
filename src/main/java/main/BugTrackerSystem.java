@@ -5,7 +5,9 @@ import command.Command;
 import command.LostInvestorsCommand;
 import command.ReportTicketCommand;
 import command.viewTickets.ViewTicketsCommand;
+import enums.ApplicationPhase;
 import enums.Role;
+import exceptions.InvalidPhaseException;
 import exceptions.UserNoPermissionException;
 import fileio.CommandInput;
 import fileio.OutputFormatter;
@@ -15,6 +17,7 @@ import ticket.TicketDatabase;
 import user.User;
 import user.UserDatabase;
 import exceptions.UserNotFoundException;
+import utils.DateManager;
 
 import java.util.List;
 
@@ -23,6 +26,8 @@ public final class BugTrackerSystem {
     private UserDatabase userDatabase = new UserDatabase();
     private TicketDatabase ticketDatabase = new TicketDatabase();
     private OutputFormatter outputFormatter = new OutputFormatter();
+    private DateManager dateManager = new DateManager();
+
     @Setter
     private boolean activeStatus = true;
 
@@ -39,6 +44,8 @@ public final class BugTrackerSystem {
                 return;
             }
 
+            dateManager.updatePhase(input.getTimestamp());
+
             User activeUser = validateUsername(input, outputs);
             if (activeUser == null) {
                 continue;
@@ -47,6 +54,10 @@ public final class BugTrackerSystem {
             Command command = getCommandFromInput(input, activeUser);
             boolean valid = validateUserPermission(input, command, activeUser, outputs);
             if (!valid) {
+                continue;
+            }
+
+            if (!validatePhasePermission(input, command, outputs)) {
                 continue;
             }
 
@@ -105,6 +116,29 @@ public final class BugTrackerSystem {
             }
         }
         return true;
+    }
+
+    private boolean validatePhasePermission(final CommandInput input, final Command command,
+                                            final List<ObjectNode> outputs) {
+        ApplicationPhase requiredPhase = command.getRequiredPhase();
+        if (requiredPhase == null)
+            return true;
+
+        ApplicationPhase currentPhase = dateManager.getCurrentPhase();
+
+        if (requiredPhase.equals(currentPhase)) {
+            return true;
+        }
+
+        InvalidPhaseException e = new InvalidPhaseException(input.getCommand(), currentPhase);
+
+        outputs.add(OutputFormatter.createError(
+                input.getCommand(),
+                input.getUsername(),
+                input.getTimestamp(),
+                e.getMessage()
+        ));
+        return false;
     }
     private Command getCommandFromInput(final CommandInput input, final User user) {
         switch (input.getCommand()) {

@@ -1,6 +1,7 @@
 package command;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import enums.ApplicationPhase;
 import enums.Role;
 import fileio.CommandInput;
 import lombok.Getter;
@@ -32,10 +33,20 @@ public abstract class Command {
     }
 
     /**
-     * Returns the list of roles required for execution
-     * @return List<Role> or null based on the command's permission
+     * Defines the list of roles required for an action's execution
+     * @return Returns List of roles for commands that require specific roles
+     * or null when all roles can execute it
      */
     public List<Role> getRequiredRoles() {
+        return null;
+    }
+
+    /**
+     * Defines the phase in which a command can be executed
+     * @return Returns the Phase, or null if the command can be executed
+     * in any phase
+     */
+    public ApplicationPhase getRequiredPhase() {
         return null;
     }
 }
