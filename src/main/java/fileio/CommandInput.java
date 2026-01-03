@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+
 @Data
 @NoArgsConstructor
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
@@ -20,12 +22,11 @@ public final class CommandInput {
     // createMilestone
     private String name;
     private String dueDate;
-    private String[] blockingFor;
-    private Integer[] tickets;
-    private String[] assignedDevs;
+    private ArrayList<String> blockingFor;
+    private ArrayList<Integer> tickets;
+    private ArrayList<String> assignedDevs;
 
     // assignTicket, addComment, changeStatus
-    //
     private Integer ticketID;
 
     //addComment

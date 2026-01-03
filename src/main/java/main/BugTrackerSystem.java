@@ -1,7 +1,7 @@
 package main;
-
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import command.Command;
+import command.CreateMilestoneCommand;
 import command.LostInvestorsCommand;
 import command.ReportTicketCommand;
 import command.viewTickets.ViewTicketsCommand;
@@ -13,6 +13,7 @@ import fileio.CommandInput;
 import fileio.OutputFormatter;
 import lombok.Getter;
 import lombok.Setter;
+import milestone.MilestoneDatabase;
 import ticket.TicketDatabase;
 import user.User;
 import user.UserDatabase;
@@ -26,6 +27,7 @@ public final class BugTrackerSystem {
     private UserDatabase userDatabase = new UserDatabase();
     private TicketDatabase ticketDatabase = new TicketDatabase();
     private OutputFormatter outputFormatter = new OutputFormatter();
+    private MilestoneDatabase milestoneDatabase = new MilestoneDatabase();
     private DateManager dateManager = new DateManager();
 
     @Setter
@@ -38,7 +40,6 @@ public final class BugTrackerSystem {
      * @param outputs
      */
     public void executeCommands(final List<CommandInput> commandInputs, final List<ObjectNode> outputs) {
-        // First, validate username
         for (CommandInput input : commandInputs) {
             if (!activeStatus) {
                 return;
@@ -146,6 +147,8 @@ public final class BugTrackerSystem {
                 return new ReportTicketCommand(input, user);
             case "viewTickets":
                 return new ViewTicketsCommand(input, user);
+            case "createMilestone":
+                return new CreateMilestoneCommand(input, user);
 
             case "lostInvestors":
                 return new LostInvestorsCommand(input, user);

@@ -2,7 +2,6 @@ package command;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import enums.Role;
-import exceptions.UserNoPermissionException;
 import fileio.CommandInput;
 import main.BugTrackerSystem;
 import user.User;

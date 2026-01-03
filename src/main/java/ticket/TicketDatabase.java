@@ -18,17 +18,29 @@ public final class TicketDatabase {
     }
 
     /**
+     * Removes a ticket from the list
+     * @param ticket
+     */
+    public void removeTicket(final Ticket ticket) {
+        tickets.remove(ticket);
+    }
+
+    /**
      * returns a ticket by id
      * @param id
      * @return
      */
-    public Ticket getTickedById(final int id) {
+    public Ticket getTicketById(final int id) {
         if (id < 0 || id >= tickets.size()) {
             return null;
         }
         return tickets.get(id);
     }
 
+    /**
+     * Returns the next ticket id available
+     * @return
+     */
     public int getNextId() {
         return tickets.size();
     }
