@@ -24,6 +24,7 @@ public class ViewTicketsCommand extends Command {
                 break;
 
             case DEVELOPER:
+                this.strategy = new ViewTicketsDeveloper();
                 break;
 
             case MANAGER:

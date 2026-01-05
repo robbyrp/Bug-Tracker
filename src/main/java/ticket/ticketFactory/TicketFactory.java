@@ -61,7 +61,7 @@ public final class TicketFactory {
      * @param input
      */
     private static void populateTicketFields(final Ticket.Builder<?> builder, final TicketInput input) {
-        builder.type(input.getType())
+        builder.type(TicketType.fromString(input.getType()))
                 .title(input.getTitle())
                 .businessPriority(BusinessPriority.fromString(input.getBusinessPriority()))
                 .status(Status.fromString(input.getStatus()))

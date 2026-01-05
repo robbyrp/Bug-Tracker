@@ -1,9 +1,6 @@
 package main;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import command.Command;
-import command.CreateMilestoneCommand;
-import command.LostInvestorsCommand;
-import command.ReportTicketCommand;
+import command.*;
 import command.viewMilestones.ViewMilestonesCommand;
 import command.viewTickets.ViewTicketsCommand;
 import enums.ApplicationPhase;
@@ -24,7 +21,6 @@ import utils.DateManager;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Locale;
 
 @Getter
 public final class BugTrackerSystem {
@@ -156,6 +152,9 @@ public final class BugTrackerSystem {
             case "viewTickets" -> new ViewTicketsCommand(input, user);
             case "createMilestone" -> new CreateMilestoneCommand(input, user);
             case "viewMilestones" -> new ViewMilestonesCommand(input, user);
+            case "assignTicket" -> new AssignTicketCommand(input, user);
+            case "undoAssignTicket" -> new UndoAssignTicketCommand(input, user);
+            case "viewAssignedTickets" -> new ViewAssignedTicketsCommand(input, user);
             case "lostInvestors" -> new LostInvestorsCommand(input, user);
             default -> throw new IllegalArgumentException("Unknown command " + input.getCommand());
         };

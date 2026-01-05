@@ -17,7 +17,7 @@ public final class CreateMilestoneCommand extends Command{
     }
 
     @Override
-    public void execute(BugTrackerSystem system, List<ObjectNode> outputs) {
+    public void execute(final BugTrackerSystem system, final List<ObjectNode> outputs) {
         List<Integer> requestedTickets = getCommandInput().getTickets();
 
         for (Integer ticketId : requestedTickets) {

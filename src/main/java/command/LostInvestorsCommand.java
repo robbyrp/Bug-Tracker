@@ -21,7 +21,6 @@ public final class LostInvestorsCommand extends Command {
 
     @Override
     public void execute(final BugTrackerSystem system, final List<ObjectNode> outputs) {
-
         system.setActiveStatus(false);
     }
 }

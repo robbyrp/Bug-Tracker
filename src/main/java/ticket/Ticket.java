@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import enums.BusinessPriority;
 import enums.ExpertiseArea;
 import enums.Status;
+import enums.TicketType;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,7 +35,7 @@ import java.util.List;
 })
 public abstract class Ticket {
     protected int id;
-    protected String type;
+    protected TicketType type;
     protected String title;
     protected BusinessPriority businessPriority;
     protected Status status;
@@ -65,6 +66,9 @@ public abstract class Ticket {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     protected String description;
 
+    @JsonIgnore
+    protected List<TicketAction> history = new ArrayList<>();
+
     protected Ticket(final Builder b) {
         this.id = b.id;
         this.type = b.type;
@@ -79,7 +83,7 @@ public abstract class Ticket {
     // T represents the future builder(inner class) of Ticket's children, for example Bug.BugBuilder
     public abstract static class Builder<T extends Builder<T>> {
         private int id;
-        private  String type;
+        private TicketType type;
         private String title;
         private BusinessPriority businessPriority;
         private Status status;
@@ -112,7 +116,7 @@ public abstract class Ticket {
          * @param types
          * @return
          */
-        public T type(final String types) {
+        public T type(final TicketType types) {
             this.type = types;
             return self();
         }
@@ -190,6 +194,10 @@ public abstract class Ticket {
 
         public abstract boolean canBeAnonymous();
 
+    }
+
+    public void addHistory(String action, String username, String timestamp) {
+        history.add(new TicketAction(action, username, timestamp));
     }
 
     /**
