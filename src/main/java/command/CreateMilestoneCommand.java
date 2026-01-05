@@ -3,7 +3,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import enums.ApplicationPhase;
 import enums.Role;
 import fileio.CommandInput;
+import fileio.OutputFormatter;
 import main.BugTrackerSystem;
+import milestone.Milestone;
 import user.User;
 
 import java.util.List;
@@ -16,7 +18,29 @@ public final class CreateMilestoneCommand extends Command{
 
     @Override
     public void execute(BugTrackerSystem system, List<ObjectNode> outputs) {
-        return;
+        List<Integer> requestedTickets = getCommandInput().getTickets();
+
+        for (Integer ticketId : requestedTickets) {
+            Milestone ticketOwner = system.getMilestoneDatabase().getMilestoneByTicketId(ticketId);
+
+            if (ticketOwner == null) {
+                continue;
+            }
+
+            String error = "Tickets " + ticketId + " already assigned to milestone " + ticketOwner.getName() + ".";
+            outputs.add(OutputFormatter.createError(
+                    getCommandInput().getCommand(),
+                    getCommandInput().getUsername(),
+                    getCommandInput().getTimestamp(),
+                    error
+            ));
+            return;
+        }
+
+        Milestone newMilestone = new Milestone(getCommandInput(), system.getMilestoneDatabase());
+
+        system.getMilestoneDatabase().addMilestone(newMilestone);
+
     }
 
     @Override

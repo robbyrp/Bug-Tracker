@@ -13,6 +13,13 @@ has a strategy interface, which is implemented by the concrete strategies, and a
 The context uses a factory to set the strategy and then implements the execute and/or undo method, and it can override the
 permission functions if needed.
 
+The class Repartition implements Comparable<> for ordering. The compareTo method sets
+criteria for comparison.  
+The class ViewTicketsCommand implements the sorting using an anonymous class inside the
+execute() method.
+
+For some strategies, like ViewMilestones, i used functional programming, because I wanted to get familiar to using streams(and why not, for bonus)
+
 Because of the stupid checkstyle that says 'parameter' hides a field i added an s to all those parameters.
 
 

@@ -41,6 +41,22 @@ public final class MilestoneDatabase {
         return null;
     }
 
+    /**
+     * Returns the milestone that contains the ticket with ticketId;
+     * Returns null if the ticket with ticketId is not in any milestone
+     * @param ticketId
+     * @return
+     */
+    public Milestone getMilestoneByTicketId(final Integer ticketId) {
+        for (Milestone m : milestoneList) {
+            ArrayList<Integer> ticketsInMilestone = m.getTickets();
+            if (ticketsInMilestone.contains(ticketId)) {
+                return m;
+            }
+        }
+        return null;
+    }
+
 
 
 

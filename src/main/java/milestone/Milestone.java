@@ -1,9 +1,13 @@
 package milestone;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import enums.BusinessPriority;
 import enums.MilestoneStatus;
 import enums.Status;
 import fileio.CommandInput;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import ticket.Ticket;
@@ -12,9 +16,15 @@ import ticket.TicketDatabase;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.IllformedLocaleException;
 import java.util.Objects;
 
+@JsonPropertyOrder({
+        "name", "blockingFor", "dueDate", "createdAt", "tickets", "assignedDevs",
+        "createdBy", "status", "isBlocked", "daysUntilDue", "overdueBy",
+        "openTickets", "closedTickets", "completionPercentage", "repartition"
+})
 @Getter @Setter
 public final class Milestone {
     // Input fields
@@ -23,18 +33,27 @@ public final class Milestone {
     private ArrayList<String> blockingFor;
     private ArrayList<Integer> tickets;
     private ArrayList<String> assignedDevs;
+    private String createdBy;
 
     // Output fields
     private LocalDate createdAt;
     private MilestoneStatus status;
+    @Getter(AccessLevel.NONE)
     private boolean isBlocked;
     private Integer daysUntilDue;
     private Integer overdueBy;
     private ArrayList<Integer> openTickets;
     private ArrayList<Integer> closedTickets;
     private Double completionPercentage;
-    private Repartition repartition;
+    private ArrayList<Repartition> repartition;
 
+    @JsonIgnore
+    private LocalDate lastPriorityUpdateDate;
+
+    @JsonProperty("isBlocked")
+    public boolean isBlocked() {
+        return isBlocked;
+    }
 
     /**
      * Constructs fields from input and safely initializes
@@ -42,10 +61,11 @@ public final class Milestone {
      * blockedFor field
      * @param commandInput
      */
-    Milestone(final CommandInput commandInput, final MilestoneDatabase milestoneDatabase) {
+    public Milestone(final CommandInput commandInput, final MilestoneDatabase milestoneDatabase) {
         this.name = commandInput.getName();
         this.dueDate = LocalDate.parse(commandInput.getDueDate());
 
+        //TODO: Verifica sa vezi daca mai ai nevoie sa modifici isBlocked pe this
         this.blockingFor = commandInput.getBlockingFor();
         for (String milestoneName : blockingFor) {
             Milestone milestone = milestoneDatabase.getMilestoneByName(milestoneName);
@@ -56,22 +76,30 @@ public final class Milestone {
 
         this.tickets = commandInput.getTickets();
         this.assignedDevs = commandInput.getAssignedDevs();
+        this.createdBy = commandInput.getUsername();
         this.createdAt = LocalDate.parse(commandInput.getTimestamp());
+        this.lastPriorityUpdateDate = this.createdAt;
 
         this.status = MilestoneStatus.ACTIVE;
         this.openTickets = new ArrayList<>(tickets);
         this.closedTickets = new ArrayList<>();
         this.completionPercentage = 0.0;
         this.isBlocked = false;
+        this.repartition = new ArrayList<>();
+        for (String developerUsername : assignedDevs) {
+            this.repartition.add(new Repartition(developerUsername));
+        }
     }
 
-    public void updateMilestones(final LocalDate currentDate, final TicketDatabase ticketDatabase,
+    public void updateMilestone(final LocalDate currentDate, final TicketDatabase ticketDatabase,
                                  final MilestoneDatabase milestoneDatabase) {
-        calculateTimeMetrics(currentDate);
+        // TODO: Verific ce se intampla daca primesc mai multe comenzi intr-o singura zi(creste priority?
 
-        calculateTicketProgress(ticketDatabase);
+        updateTimeMetrics(currentDate);
 
-        incrementTicketPriority(currentDate, ticketDatabase);
+        updateTicketProgress(ticketDatabase);
+
+        unblockMilestones(milestoneDatabase);
 
         updateTicketStatus(currentDate, ticketDatabase);
 
@@ -81,13 +109,14 @@ public final class Milestone {
      * Sets the dausUntilDue and overdueBy members
      * @param currentDate
      */
-    private void calculateTimeMetrics(final LocalDate currentDate) {
-        int daysBetween = (int) ChronoUnit.DAYS.between(currentDate, dueDate) + 1;
-        if (daysBetween < 1) {
+    private void updateTimeMetrics(final LocalDate currentDate) {
+        int daysBetween = (int) ChronoUnit.DAYS.between(currentDate, dueDate);
+
+        if (daysBetween < 0) {
             this.daysUntilDue = 0;
-            this.overdueBy = 1 - daysBetween;
+            this.overdueBy = Math.abs(daysBetween) + 1;
         } else {
-            this.daysUntilDue = daysBetween;
+            this.daysUntilDue = daysBetween + 1;
             this.overdueBy = 0;
         }
     }
@@ -95,19 +124,37 @@ public final class Milestone {
     /**
      * Updates the closedTickets and openTickets member lists
      * Calculates and sets the completionPercentage
+     * Actualizes the repartition and sorts it
      * @param ticketDatabase
      */
-    private void calculateTicketProgress(final TicketDatabase ticketDatabase) {
+    private void updateTicketProgress(final TicketDatabase ticketDatabase) {
         this.openTickets.clear();
         this.closedTickets.clear();
 
+        for (Repartition r : repartition) {
+            r.clear();
+        }
+
         for (Integer ticketId : this.tickets) {
             Ticket t = ticketDatabase.getTicketById(ticketId);
-            if (t != null) {
-                if (t.getStatus() == Status.CLOSED || t.getStatus() == Status.RESOLVED) {
-                    this.closedTickets.add(ticketId);
-                } else {
-                    this.openTickets.add(ticketId);
+
+            if (t == null) {
+                continue;
+            }
+
+            if (t.getStatus() == Status.CLOSED || t.getStatus() == Status.RESOLVED) {
+                this.closedTickets.add(ticketId);
+            } else {
+                this.openTickets.add(ticketId);
+            }
+
+            String assignedDev = t.getAssignedTo();
+            if (assignedDev != null && !assignedDev.isEmpty()) {
+                for (Repartition r : repartition) {
+                    if (r.getDeveloper().equals(assignedDev)) {
+                        r.addTicketId(ticketId);
+                        break;
+                    }
                 }
             }
         }
@@ -117,6 +164,8 @@ public final class Milestone {
         } else {
             this.completionPercentage = (double) closedTickets.size() / tickets.size() * 100;
         }
+
+        Collections.sort(this.repartition);
     }
 
     /** Helper method for updateTicketStatus
@@ -126,6 +175,10 @@ public final class Milestone {
      * @param ticketDatabase
      */
     private void incrementTicketPriority(final LocalDate currentDate, final TicketDatabase ticketDatabase) {
+        if (lastPriorityUpdateDate != null && !currentDate.isAfter(lastPriorityUpdateDate)) {
+            return;
+        }
+
         int daysBetween = (int) ChronoUnit.DAYS.between(this.createdAt, currentDate) + 1;
 
         if (daysBetween % 3 == 1 && daysBetween != 1) {
@@ -139,6 +192,7 @@ public final class Milestone {
             }
         }
 
+        this.lastPriorityUpdateDate = currentDate;
     }
 
     /** Helper method for updateTicketStatus
@@ -171,7 +225,7 @@ public final class Milestone {
         incrementTicketPriority(currentDate, ticketDatabase);
 
         int daysBetweenCurrDue = (int) ChronoUnit.DAYS.between(currentDate, this.dueDate);
-        boolean dueDatePassed = daysBetweenCurrDue > 0;
+        boolean dueDatePassed = daysBetweenCurrDue < 0;
         if (daysBetweenCurrDue == 1 || dueDatePassed) {
             updateToCritical(currentDate, ticketDatabase);
         }

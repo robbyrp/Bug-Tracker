@@ -36,13 +36,13 @@ public final class ReportTicketCommand extends Command {
     @Override
     public void execute(final BugTrackerSystem system, final List<ObjectNode> outputs) {
         //TODO: CHECK PENTRU DEPASIRE PERIOADA DE TESTARE SI RAPORTARE ANONIMA
-        TicketInput ticketInputParams = getInput().getParams();
+        TicketInput ticketInputParams = getCommandInput().getParams();
 
         if (Objects.equals(ticketInputParams.getReportedBy(), "")) {
             if (!Objects.equals(ticketInputParams.getType(), "BUG")) {
                 String errorMessage = "Anonymous reports are only allowed for tickets of type BUG.";
-                outputs.add(OutputFormatter.createError(getInput().getCommand(), getInput().getUsername(),
-                        getInput().getTimestamp(), errorMessage));
+                outputs.add(OutputFormatter.createError(getCommandInput().getCommand(), getCommandInput().getUsername(),
+                        getCommandInput().getTimestamp(), errorMessage));
                 return;
             }
         }
@@ -54,7 +54,7 @@ public final class ReportTicketCommand extends Command {
 
         newTicket.setStatus(Status.OPEN);
 
-        String ticketReportedTimestampString = getInput().getTimestamp();
+        String ticketReportedTimestampString = getCommandInput().getTimestamp();
         LocalDate reportedTimestamp = LocalDate.parse(ticketReportedTimestampString);
         newTicket.setReportedTimestamp(reportedTimestamp);
 

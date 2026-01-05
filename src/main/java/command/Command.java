@@ -13,11 +13,11 @@ import java.util.List;
 @Getter
 public abstract class Command {
 
-    private CommandInput input;
+    private CommandInput commandInput;
     private User user;
 
     public Command(CommandInput input, User user) {
-        this.input = input;
+        this.commandInput = input;
         this.user = user;
     }
 

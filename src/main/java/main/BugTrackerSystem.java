@@ -4,6 +4,7 @@ import command.Command;
 import command.CreateMilestoneCommand;
 import command.LostInvestorsCommand;
 import command.ReportTicketCommand;
+import command.viewMilestones.ViewMilestonesCommand;
 import command.viewTickets.ViewTicketsCommand;
 import enums.ApplicationPhase;
 import enums.Role;
@@ -13,6 +14,7 @@ import fileio.CommandInput;
 import fileio.OutputFormatter;
 import lombok.Getter;
 import lombok.Setter;
+import milestone.Milestone;
 import milestone.MilestoneDatabase;
 import ticket.TicketDatabase;
 import user.User;
@@ -20,7 +22,9 @@ import user.UserDatabase;
 import exceptions.UserNotFoundException;
 import utils.DateManager;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 
 @Getter
 public final class BugTrackerSystem {
@@ -40,26 +44,31 @@ public final class BugTrackerSystem {
      * @param outputs
      */
     public void executeCommands(final List<CommandInput> commandInputs, final List<ObjectNode> outputs) {
-        for (CommandInput input : commandInputs) {
+        for (CommandInput commandInput : commandInputs) {
             if (!activeStatus) {
                 return;
             }
 
-            dateManager.updatePhase(input.getTimestamp());
+            dateManager.updatePhase(commandInput.getTimestamp());
 
-            User activeUser = validateUsername(input, outputs);
+            User activeUser = validateUsername(commandInput, outputs);
             if (activeUser == null) {
                 continue;
             }
 
-            Command command = getCommandFromInput(input, activeUser);
-            boolean valid = validateUserPermission(input, command, activeUser, outputs);
+            Command command = getCommandFromInput(commandInput, activeUser);
+            boolean valid = validateUserPermission(commandInput, command, activeUser, outputs);
             if (!valid) {
                 continue;
             }
 
-            if (!validatePhasePermission(input, command, outputs)) {
+            if (!validatePhasePermission(commandInput, command, outputs)) {
                 continue;
+            }
+
+            LocalDate currentDate = LocalDate.parse(commandInput.getTimestamp());
+            for (Milestone milestone : milestoneDatabase.getMilestoneList()) {
+                milestone.updateMilestone(currentDate, ticketDatabase, milestoneDatabase);
             }
 
             command.execute(this, outputs);
@@ -142,20 +151,14 @@ public final class BugTrackerSystem {
         return false;
     }
     private Command getCommandFromInput(final CommandInput input, final User user) {
-        switch (input.getCommand()) {
-            case "reportTicket":
-                return new ReportTicketCommand(input, user);
-            case "viewTickets":
-                return new ViewTicketsCommand(input, user);
-            case "createMilestone":
-                return new CreateMilestoneCommand(input, user);
-
-            case "lostInvestors":
-                return new LostInvestorsCommand(input, user);
-
-            default:
-                throw new IllegalArgumentException("Unknown command " + input.getCommand());
-        }
+        return switch (input.getCommand()) {
+            case "reportTicket" -> new ReportTicketCommand(input, user);
+            case "viewTickets" -> new ViewTicketsCommand(input, user);
+            case "createMilestone" -> new CreateMilestoneCommand(input, user);
+            case "viewMilestones" -> new ViewMilestonesCommand(input, user);
+            case "lostInvestors" -> new LostInvestorsCommand(input, user);
+            default -> throw new IllegalArgumentException("Unknown command " + input.getCommand());
+        };
     }
 
 }

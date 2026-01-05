@@ -56,9 +56,9 @@ public class ViewTicketsCommand extends Command {
          });
 
          outputs.add(OutputFormatter.createListResponse(
-                 getInput().getCommand(),
+                 getCommandInput().getCommand(),
                  getUser().getUsername(),
-                 getInput().getTimestamp(),
+                 getCommandInput().getTimestamp(),
                  "tickets",
                  roleSpecificTickets
          ));
