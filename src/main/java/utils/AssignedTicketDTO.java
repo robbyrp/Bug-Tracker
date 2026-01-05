@@ -6,6 +6,7 @@ import enums.BusinessPriority;
 import enums.Status;
 import enums.TicketType;
 import lombok.Getter;
+import ticket.Comment;
 import ticket.Ticket;
 
 import java.time.LocalDate;
@@ -30,7 +31,7 @@ public final class AssignedTicketDTO {
     private final LocalDate assignedAt;
 
     private final String reportedBy;
-    private final List<String> comments;
+    private final List<Comment> comments;
 
     public AssignedTicketDTO(Ticket t) {
         this.id = t.getId();

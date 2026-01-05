@@ -8,8 +8,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.List;
 
 public final class OutputFormatter {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static ObjectMapper mapper = new ObjectMapper();
 
+    private OutputFormatter() {
+        throw new IllegalStateException("Linter keeps screaming at me : utility class");
+    }
     /**
      *
      */

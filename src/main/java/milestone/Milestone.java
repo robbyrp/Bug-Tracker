@@ -17,7 +17,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.IllformedLocaleException;
 import java.util.Objects;
 
 @JsonPropertyOrder({
@@ -49,6 +48,10 @@ public final class Milestone {
 
     @JsonIgnore
     private LocalDate lastPriorityUpdateDate;
+    @JsonIgnore
+    private static final double MAX_PERCENTAGE = 100.0;
+    @JsonIgnore
+    private static final int DAYS_BETWEEN_UPDATES= 3;
 
     @JsonProperty("isBlocked")
     public boolean isBlocked() {
@@ -69,8 +72,9 @@ public final class Milestone {
         this.blockingFor = commandInput.getBlockingFor();
         for (String milestoneName : blockingFor) {
             Milestone milestone = milestoneDatabase.getMilestoneByName(milestoneName);
-            if (milestone == null)
+            if (milestone == null) {
                 continue;
+            }
             milestone.isBlocked = true;
         }
 
@@ -91,9 +95,18 @@ public final class Milestone {
         }
     }
 
-    public void updateMilestone(final LocalDate currentDate, final TicketDatabase ticketDatabase,
-                                 final MilestoneDatabase milestoneDatabase) {
-        // TODO: Verific ce se intampla daca primesc mai multe comenzi intr-o singura zi(creste priority?
+    /**
+     * Public method that calls helper methods to update Milestone fields.
+     * Updates the Milestone calling the method
+     * @param currentDate
+     * @param ticketDatabase
+     * @param milestoneDatabase
+     */
+    public void updateMilestone(final LocalDate currentDate,
+                                final TicketDatabase ticketDatabase,
+                                final MilestoneDatabase milestoneDatabase) {
+        // TODO: Verific ce se intampla daca primesc
+        //  mai multe comenzi intr-o singura zi(creste priority)?
 
         updateTimeMetrics(currentDate);
 
@@ -160,9 +173,10 @@ public final class Milestone {
         }
 
         if (tickets.isEmpty()) {
-            this.completionPercentage = 100.0;
+            this.completionPercentage = MAX_PERCENTAGE;
         } else {
-            this.completionPercentage = (double) closedTickets.size() / tickets.size() * 100;
+            this.completionPercentage = (double) closedTickets.size()
+                    / tickets.size() * MAX_PERCENTAGE;
         }
 
         Collections.sort(this.repartition);
@@ -174,17 +188,19 @@ public final class Milestone {
      * @param currentDate
      * @param ticketDatabase
      */
-    private void incrementTicketPriority(final LocalDate currentDate, final TicketDatabase ticketDatabase) {
+    private void incrementTicketPriority(final LocalDate currentDate,
+                                         final TicketDatabase ticketDatabase) {
         if (lastPriorityUpdateDate != null && !currentDate.isAfter(lastPriorityUpdateDate)) {
             return;
         }
 
         int daysBetween = (int) ChronoUnit.DAYS.between(this.createdAt, currentDate) + 1;
 
-        if (daysBetween % 3 == 1 && daysBetween != 1) {
+        if (daysBetween % DAYS_BETWEEN_UPDATES == 1 && daysBetween != 1) {
             for (Integer ticketId : this.tickets) {
                 Ticket t = ticketDatabase.getTicketById(ticketId);
                 switch (Objects.requireNonNull(t).getBusinessPriority()) {
+
                     case LOW -> t.setBusinessPriority(BusinessPriority.MEDIUM);
                     case MEDIUM -> t.setBusinessPriority(BusinessPriority.HIGH);
                     case HIGH -> t.setBusinessPriority(BusinessPriority.CRITICAL);
@@ -202,7 +218,8 @@ public final class Milestone {
      * @param currentDate
      * @param ticketDatabase
      */
-    private void updateToCritical(final LocalDate currentDate, final TicketDatabase ticketDatabase) {
+    private void updateToCritical(final LocalDate currentDate,
+                                  final TicketDatabase ticketDatabase) {
         for (Integer ticketId : this.tickets) {
             Ticket t = ticketDatabase.getTicketById(ticketId);
             Status currentStatus = Objects.requireNonNull(t.getStatus());
@@ -219,8 +236,9 @@ public final class Milestone {
      * @param currentDate the date when calling the update method
      */
     public void updateTicketStatus(final LocalDate currentDate, final TicketDatabase ticketDatabase) {
-        if (this.isBlocked)
+        if (this.isBlocked) {
             return;
+        }
 
         incrementTicketPriority(currentDate, ticketDatabase);
 
@@ -243,8 +261,9 @@ public final class Milestone {
      * @param milestoneDatabase
      */
     private void unblockMilestones(final MilestoneDatabase milestoneDatabase) {
-        if (!this.openTickets.isEmpty())
+        if (!this.openTickets.isEmpty()) {
             return;
+        }
 
         for (String milestoneName : this.blockingFor) {
             Milestone milestone = milestoneDatabase.getMilestoneByName(milestoneName);

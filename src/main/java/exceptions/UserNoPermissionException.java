@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserNoPermissionException extends RuntimeException {
-    public UserNoPermissionException(List<Role> requiredRoles, Role userRole) {
+    public UserNoPermissionException(final List<Role> requiredRoles, final Role userRole) {
         super(generateMessage(requiredRoles, userRole));
     }
 
@@ -17,13 +17,15 @@ public class UserNoPermissionException extends RuntimeException {
      * @param userRole
      * @return
      */
-    private static String generateMessage(List<Role> requiredRoles, Role userRole) {
+    private static String generateMessage(final List<Role> requiredRoles,
+                                          final Role userRole) {
         String rolesString = requiredRoles.stream()
                 .map(Role::toString)
                 .collect(Collectors.joining(", "));
 
         return String.format(
-                "The user does not have permission to execute this command: required role %s; user role %s.",
+                "The user does not have permission to execute "
+                        + "this command: required role %s; user role %s.",
                 rolesString,
                 userRole.toString()
         );

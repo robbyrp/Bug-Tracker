@@ -10,7 +10,7 @@ import java.util.List;
 
 public final class LostInvestorsCommand extends Command {
 
-    public LostInvestorsCommand(CommandInput input, User user) {
+    public LostInvestorsCommand(final CommandInput input, final User user) {
         super(input, user);
     }
 

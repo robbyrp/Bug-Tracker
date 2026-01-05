@@ -1,6 +1,7 @@
 package main;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import command.*;
+import command.addComment.AddCommentCommand;
 import command.viewMilestones.ViewMilestonesCommand;
 import command.viewTickets.ViewTicketsCommand;
 import enums.ApplicationPhase;
@@ -26,7 +27,6 @@ import java.util.List;
 public final class BugTrackerSystem {
     private UserDatabase userDatabase = new UserDatabase();
     private TicketDatabase ticketDatabase = new TicketDatabase();
-    private OutputFormatter outputFormatter = new OutputFormatter();
     private MilestoneDatabase milestoneDatabase = new MilestoneDatabase();
     private DateManager dateManager = new DateManager();
 
@@ -39,7 +39,8 @@ public final class BugTrackerSystem {
      * @param commandInputs
      * @param outputs
      */
-    public void executeCommands(final List<CommandInput> commandInputs, final List<ObjectNode> outputs) {
+    public void executeCommands(final List<CommandInput> commandInputs,
+                                final List<ObjectNode> outputs) {
         for (CommandInput commandInput : commandInputs) {
             if (!activeStatus) {
                 return;
@@ -78,7 +79,8 @@ public final class BugTrackerSystem {
      * @param outputs
      * @return If valid, returns the User object associated with the username. Null otherwise.
      */
-    private User validateUsername(final CommandInput input, List<ObjectNode> outputs) {
+    private User validateUsername(final CommandInput input,
+                                  final List<ObjectNode> outputs) {
         String username = input.getUsername();
         if (!userDatabase.getUsers().containsKey(username)) {
             UserNotFoundException e = new UserNotFoundException(username);
@@ -103,7 +105,7 @@ public final class BugTrackerSystem {
      * @return True if the user is allowed, false otherwise
      */
     private boolean validateUserPermission(final CommandInput input, final Command command,
-                                           final User user, List<ObjectNode> outputs) {
+                                           final User user, final List<ObjectNode> outputs) {
         List<Role> requiredRoles = command.getRequiredRoles();
 
         if (requiredRoles != null) {
@@ -127,8 +129,9 @@ public final class BugTrackerSystem {
     private boolean validatePhasePermission(final CommandInput input, final Command command,
                                             final List<ObjectNode> outputs) {
         ApplicationPhase requiredPhase = command.getRequiredPhase();
-        if (requiredPhase == null)
+        if (requiredPhase == null) {
             return true;
+        }
 
         ApplicationPhase currentPhase = dateManager.getCurrentPhase();
 
@@ -155,6 +158,9 @@ public final class BugTrackerSystem {
             case "assignTicket" -> new AssignTicketCommand(input, user);
             case "undoAssignTicket" -> new UndoAssignTicketCommand(input, user);
             case "viewAssignedTickets" -> new ViewAssignedTicketsCommand(input, user);
+            case "addComment" -> new AddCommentCommand(input, user);
+            case "undoAddComment" -> new UndoAddCommentCommand(input, user);
+
             case "lostInvestors" -> new LostInvestorsCommand(input, user);
             default -> throw new IllegalArgumentException("Unknown command " + input.getCommand());
         };

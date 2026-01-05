@@ -57,7 +57,7 @@ public abstract class Ticket {
     protected String assignedTo = "";
 
     protected String reportedBy;
-    protected List<String> comments = new ArrayList<>();
+    protected List<Comment> comments = new ArrayList<>();
 
     @JsonIgnore
     protected ExpertiseArea expertiseArea;

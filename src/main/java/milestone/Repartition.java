@@ -4,14 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 
 @Getter @Setter
 public final class Repartition implements Comparable<Repartition> {
     private String developer;
     private ArrayList<Integer> assignedTickets;
 
-    public Repartition(String developer) {
+    public Repartition(final String developer) {
         this.developer = developer;
         this.assignedTickets = new ArrayList<>();
     }
@@ -21,7 +20,7 @@ public final class Repartition implements Comparable<Repartition> {
      * Adds the ticketId in the ticketId arrayList
      * @param ticketId
      */
-    public void addTicketId(Integer ticketId) {
+    public void addTicketId(final Integer ticketId) {
         this.assignedTickets.add(ticketId);
     }
 

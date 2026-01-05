@@ -4,7 +4,6 @@ import enums.Status;
 import main.BugTrackerSystem;
 import milestone.Milestone;
 import ticket.Ticket;
-import ticket.TicketDatabase;
 import user.User;
 
 import java.util.ArrayList;

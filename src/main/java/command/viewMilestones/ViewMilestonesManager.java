@@ -7,7 +7,7 @@ import user.User;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class ViewMilestonesManager implements ViewMilestonesStrategy{
+public final class ViewMilestonesManager implements ViewMilestonesStrategy {
     /**
      * A manager can only see the milestones he created
      */

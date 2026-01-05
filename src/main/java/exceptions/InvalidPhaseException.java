@@ -11,7 +11,7 @@ public class InvalidPhaseException extends RuntimeException {
         super(generateMessage(commandName));
     }
 
-    private static String generateMessage(String commandName) {
+    private static String generateMessage(final String commandName) {
         if (Objects.equals(commandName, "reportTicket")) {
             return "Tickets can only be reported during testing phases.";
         }

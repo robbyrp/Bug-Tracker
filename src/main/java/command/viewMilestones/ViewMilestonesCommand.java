@@ -11,15 +11,18 @@ import user.User;
 import java.util.Comparator;
 import java.util.List;
 
-public class ViewMilestonesCommand extends Command {
-    ViewMilestonesStrategy strategy;
+public final class ViewMilestonesCommand extends Command {
+    private ViewMilestonesStrategy strategy;
 
+    /**
+     * Constructor that sets the context strategy with a switch case
+     * @param input
+     * @param user
+     */
     public ViewMilestonesCommand(final CommandInput input, final User user) {
         super(input, user);
 
-        switch(user.getRole()) {
-            case REPORTER:
-                break;
+        switch (user.getRole()) {
 
             case DEVELOPER:
                 this.strategy = new ViewMilestonesDeveloper();
@@ -34,13 +37,18 @@ public class ViewMilestonesCommand extends Command {
         }
     }
 
+    /**
+     * Execute method from command pattern that sorts the milestone list
+     * @param system The engine of the program
+     * @param outputs output mapper
+     */
     @Override
     public void execute(final BugTrackerSystem system, final List<ObjectNode> outputs) {
         List<Milestone> milestones = strategy.getMilestones(system, getUser());
 
         milestones.sort(new Comparator<Milestone>() {
             @Override
-            public int compare(Milestone o1, Milestone o2) {
+            public int compare(final Milestone o1, final Milestone o2) {
                 int compareByDate = o1.getDueDate().compareTo(o2.getDueDate());
 
                 if (compareByDate != 0) {
@@ -57,8 +65,6 @@ public class ViewMilestonesCommand extends Command {
                 getCommandInput().getTimestamp(),
                 "milestones",
                 milestones
-                )
-
-        );
+                ));
     }
 }

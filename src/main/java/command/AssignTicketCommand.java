@@ -1,7 +1,13 @@
 package command;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import enums.*;
+import enums.ApplicationPhase;
+import enums.ExpertiseArea;
+import enums.Role;
+import enums.Status;
+import enums.Seniority;
+import enums.BusinessPriority;
+import enums.TicketType;
 import fileio.CommandInput;
 import fileio.OutputFormatter;
 import main.BugTrackerSystem;
@@ -15,8 +21,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class AssignTicketCommand extends Command{
-    public AssignTicketCommand(CommandInput input, User user) {
+public final class AssignTicketCommand extends Command {
+    public AssignTicketCommand(final CommandInput input, final User user) {
         super(input, user);
     }
 
@@ -45,7 +51,7 @@ public final class AssignTicketCommand extends Command{
             return;
         }
 
-        if (!checkOpenStatus(system ,outputs, ticket)) {
+        if (!checkOpenStatus(system, outputs, ticket)) {
             return;
         }
 
@@ -65,9 +71,8 @@ public final class AssignTicketCommand extends Command{
         ticket.addHistory("ASSIGNED", getUser().getUsername(), getCommandInput().getTimestamp());
     }
 
-    private boolean checkExpertiseArea(final BugTrackerSystem system, final List<ObjectNode> outputs,
-                                    final Ticket ticket)
-    {
+    private boolean checkExpertiseArea(final BugTrackerSystem system,
+                                       final List<ObjectNode> outputs, final Ticket ticket) {
         Developer developer = (Developer) getUser();
         ExpertiseArea devExpertise = developer.getExpertiseArea();
         String ticketZone = ticket.getExpertiseArea().name();
@@ -85,10 +90,10 @@ public final class AssignTicketCommand extends Command{
 
         String requiredString = String.join(", ", requiredAreas);
 
-        String error = "Developer " + developer.getUsername() +
-                " cannot assign ticket " + ticket.getId() +
-                " due to expertise area. Required: " + requiredString +
-                "; Current: " + devExpertise.name() + ".";
+        String error = "Developer " + developer.getUsername()
+                + " cannot assign ticket " + ticket.getId()
+                + " due to expertise area. Required: " + requiredString
+                + "; Current: " + devExpertise.name() + ".";
 
         outputs.add(OutputFormatter.createError(
                 getCommandInput().getCommand(),
@@ -107,8 +112,8 @@ public final class AssignTicketCommand extends Command{
         BusinessPriority businessPriority = ticket.getBusinessPriority();
         TicketType ticketType = ticket.getType();
 
-        if (seniority.hasAccessToPriority(businessPriority) &&
-            seniority.hasAccessToTicketType(ticketType)) {
+        if (seniority.hasAccessToPriority(businessPriority)
+                && seniority.hasAccessToTicketType(ticketType)) {
             return true;
         }
 
@@ -122,10 +127,10 @@ public final class AssignTicketCommand extends Command{
 
         String requiredString = String.join(", ", requiredSeniority);
 
-        String error = "Developer " + developer.getUsername() +
-                " cannot assign ticket " + ticket.getId() +
-                " due to seniority level. Required: " + requiredString +
-                "; Current: " + seniority.name() + ".";
+        String error = "Developer " + developer.getUsername()
+                + " cannot assign ticket " + ticket.getId()
+                + " due to seniority level. Required: " + requiredString
+                + "; Current: " + seniority.name() + ".";
 
         outputs.add(OutputFormatter.createError(
                 getCommandInput().getCommand(),
@@ -154,22 +159,24 @@ public final class AssignTicketCommand extends Command{
         return true;
     }
 
-    private boolean checkAssignedMilestone(final BugTrackerSystem system, final List<ObjectNode> outputs,
-                                           final Ticket ticket) {
+    private boolean checkAssignedMilestone(final BugTrackerSystem system,
+                                           final List<ObjectNode> outputs, final Ticket ticket) {
         Developer developer = (Developer) getUser();
 
-        Milestone ownerMilestone = system.getMilestoneDatabase().getMilestoneByTicketId(ticket.getId());
+        Milestone ownerMilestone =
+                system.getMilestoneDatabase().getMilestoneByTicketId(ticket.getId());
 
         if (ownerMilestone == null) {
-            throw new IllegalArgumentException("Ticket " + ticket.getId() + " was not in any milestone");
+            throw new IllegalArgumentException("Ticket "
+                    + ticket.getId() + " was not in any milestone");
         }
 
         if (ownerMilestone.getAssignedDevs().contains(developer.getUsername())) {
             return true;
         }
 
-        String error = "Developer " + developer.getUsername() +
-                " is not assigned to milestone " + ownerMilestone.getName() + ".";
+        String error = "Developer " + developer.getUsername()
+                + " is not assigned to milestone " + ownerMilestone.getName() + ".";
 
         outputs.add(OutputFormatter.createError(
                 getCommandInput().getCommand(),
@@ -182,22 +189,24 @@ public final class AssignTicketCommand extends Command{
 
     }
 
-    private boolean checkBlockedMilestone(final BugTrackerSystem system, final List<ObjectNode> outputs,
-                                          final Ticket ticket) {
+    private boolean checkBlockedMilestone(final BugTrackerSystem system,
+                                          final List<ObjectNode> outputs, final Ticket ticket) {
         Developer developer = (Developer) getUser();
 
-        Milestone ownerMilestone = system.getMilestoneDatabase().getMilestoneByTicketId(ticket.getId());
+        Milestone ownerMilestone =
+                system.getMilestoneDatabase().getMilestoneByTicketId(ticket.getId());
 
         if (ownerMilestone == null) {
-            throw new IllegalArgumentException("Ticket " + ticket.getId() + " was not in any milestone");
+            throw new IllegalArgumentException("Ticket "
+                    + ticket.getId() + " was not in any milestone");
         }
 
-        if (! ownerMilestone.isBlocked()) {
+        if (!ownerMilestone.isBlocked()) {
             return true;
         }
 
         String error = "Cannot assign ticket " + ticket.getId() + " from blocked milestone "
-                + ownerMilestone.getName() +".";
+                + ownerMilestone.getName() + ".";
 
         outputs.add(OutputFormatter.createError(
                 getCommandInput().getCommand(),

@@ -19,7 +19,7 @@ import java.util.Objects;
 
 public final class ReportTicketCommand extends Command {
 
-    public ReportTicketCommand(CommandInput input, User user) {
+    public ReportTicketCommand(final CommandInput input, final User user) {
         super(input, user);
     }
 
@@ -40,9 +40,14 @@ public final class ReportTicketCommand extends Command {
 
         if (Objects.equals(ticketInputParams.getReportedBy(), "")) {
             if (!Objects.equals(ticketInputParams.getType(), "BUG")) {
-                String errorMessage = "Anonymous reports are only allowed for tickets of type BUG.";
-                outputs.add(OutputFormatter.createError(getCommandInput().getCommand(), getCommandInput().getUsername(),
-                        getCommandInput().getTimestamp(), errorMessage));
+                String error = "Anonymous reports are only allowed "
+                        + "for tickets of type BUG.";
+                outputs.add(OutputFormatter.createError(
+                        getCommandInput().getCommand(),
+                        getCommandInput().getUsername(),
+                        getCommandInput().getTimestamp(),
+                        error
+                ));
                 return;
             }
         }

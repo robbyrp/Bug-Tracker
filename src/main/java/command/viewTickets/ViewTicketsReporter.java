@@ -6,9 +6,8 @@ import user.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-public class ViewTicketsReporter implements ViewTicketsStrategy{
+public class ViewTicketsReporter implements ViewTicketsStrategy {
 
     /**
      * A reporter can only view the tickets he submitted

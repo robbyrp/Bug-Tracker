@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public final class ViewAssignedTicketsCommand extends Command{
+public final class ViewAssignedTicketsCommand extends Command {
 
-    public ViewAssignedTicketsCommand(CommandInput input, User user) {
+    public ViewAssignedTicketsCommand(final CommandInput input, final User user) {
         super(input, user);
     }
 
@@ -47,13 +47,15 @@ public final class ViewAssignedTicketsCommand extends Command{
 
         assignedToDev.sort(new Comparator<Ticket>() {
             @Override
-            public int compare(Ticket o1, Ticket o2) {
-                int compareByPriority = o2.getBusinessPriority().compareTo(o1.getBusinessPriority());
+            public int compare(final Ticket o1, final Ticket o2) {
+                int compareByPriority =
+                        o2.getBusinessPriority().compareTo(o1.getBusinessPriority());
                 if (compareByPriority != 0) {
                     return compareByPriority;
                 }
 
-                int compareByDate = o1.getReportedTimestamp().compareTo(o2.getReportedTimestamp());
+                int compareByDate =
+                        o1.getReportedTimestamp().compareTo(o2.getReportedTimestamp());
                 if (compareByDate != 0) {
                     return compareByDate;
                 }

@@ -18,7 +18,8 @@ public class ViewTicketsCommand extends Command {
     public ViewTicketsCommand(final CommandInput input, final User user) {
         super(input, user);
 
-        switch(user.getRole()) {
+        switch (user.getRole()) {
+
             case REPORTER:
                 this.strategy = new ViewTicketsReporter();
                 break;
@@ -29,6 +30,9 @@ public class ViewTicketsCommand extends Command {
 
             case MANAGER:
                 this.strategy = new ViewTicketsManager();
+                break;
+
+            default:
                 break;
         }
     }
@@ -63,7 +67,5 @@ public class ViewTicketsCommand extends Command {
                  "tickets",
                  roleSpecificTickets
          ));
-
     }
-    
 }

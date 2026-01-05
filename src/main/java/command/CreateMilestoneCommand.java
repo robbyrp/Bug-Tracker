@@ -10,9 +10,9 @@ import user.User;
 
 import java.util.List;
 
-public final class CreateMilestoneCommand extends Command{
+public final class CreateMilestoneCommand extends Command {
 
-    public CreateMilestoneCommand(CommandInput input, User user) {
+    public CreateMilestoneCommand(final CommandInput input, final User user) {
         super(input, user);
     }
 
@@ -27,7 +27,8 @@ public final class CreateMilestoneCommand extends Command{
                 continue;
             }
 
-            String error = "Tickets " + ticketId + " already assigned to milestone " + ticketOwner.getName() + ".";
+            String error = "Tickets " + ticketId
+                    + " already assigned to milestone " + ticketOwner.getName() + ".";
             outputs.add(OutputFormatter.createError(
                     getCommandInput().getCommand(),
                     getCommandInput().getUsername(),

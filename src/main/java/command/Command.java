@@ -13,24 +13,20 @@ import java.util.List;
 @Getter
 public abstract class Command {
 
-    private CommandInput commandInput;
-    private User user;
+    private final CommandInput commandInput;
+    private final User user;
 
-    public Command(CommandInput input, User user) {
+    public Command(final CommandInput input, final User user) {
         this.commandInput = input;
         this.user = user;
     }
 
     /**
      * Execute method for the command pattern
-     * @param system
-     * @param outputs
+     * @param system The engine of the program
+     * @param outputs output mapper
      */
     public abstract void execute(BugTrackerSystem system, List<ObjectNode> outputs);
-
-    public void undo(BugTrackerSystem system, List<ObjectNode> outputs) {
-        return;
-    }
 
     /**
      * Defines the list of roles required for an action's execution

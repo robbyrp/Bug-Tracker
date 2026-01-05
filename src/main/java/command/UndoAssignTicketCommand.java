@@ -12,9 +12,9 @@ import user.User;
 
 import java.util.List;
 
-public final class UndoAssignTicketCommand extends  Command{
+public final class UndoAssignTicketCommand extends  Command {
 
-    public UndoAssignTicketCommand(CommandInput input, User user) {
+    public UndoAssignTicketCommand(final CommandInput input, final User user) {
         super(input, user);
     }
 
@@ -33,7 +33,9 @@ public final class UndoAssignTicketCommand extends  Command{
         Integer ticketId = getCommandInput().getTicketID();
         Ticket ticket = system.getTicketDatabase().getTicketById(ticketId);
 
-        if (ticket == null) return;
+        if (ticket == null) {
+            return;
+        }
 
         if (!checkTicketStatus(system, outputs, ticket)) {
             return;
