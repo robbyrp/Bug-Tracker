@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.Setter;
 import milestone.Milestone;
 import milestone.MilestoneDatabase;
+import milestone.MilestoneManager;
 import ticket.TicketDatabase;
 import user.User;
 import user.UserDatabase;
@@ -29,6 +30,7 @@ public final class BugTrackerSystem {
     private UserDatabase userDatabase = new UserDatabase();
     private TicketDatabase ticketDatabase = new TicketDatabase();
     private MilestoneDatabase milestoneDatabase = new MilestoneDatabase();
+    private MilestoneManager milestoneManager = new MilestoneManager();
     private DateManager dateManager = new DateManager();
 
     @Setter
@@ -65,9 +67,8 @@ public final class BugTrackerSystem {
             }
 
             LocalDate currentDate = LocalDate.parse(commandInput.getTimestamp());
-            for (Milestone milestone : milestoneDatabase.getMilestoneList()) {
-                milestone.updateMilestone(currentDate, ticketDatabase, milestoneDatabase, userDatabase);
-            }
+
+            milestoneManager.updateAllMilestones(milestoneDatabase, ticketDatabase, userDatabase, currentDate);
 
             command.execute(this, outputs);
 

@@ -57,7 +57,25 @@ public final class MilestoneDatabase {
         return null;
     }
 
+    /**
+     * Returns the list of milestones with the names in the list parameters
+     * @param names
+     * @return
+     */
+    public List<Milestone> getMilestonesByNames(List<String> names) {
+        if (names == null || names.isEmpty()) {
+            return new ArrayList<>();
+        }
 
+        List<Milestone> milestones = new ArrayList<>();
 
+        for (String name : names) {
+            Milestone milestone = getMilestoneByName(name);
+            if (milestone != null) {
+                milestones.add(milestone);
+            }
+        }
+        return milestones;
+    }
 
 }
