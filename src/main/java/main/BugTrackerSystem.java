@@ -164,7 +164,7 @@ public final class BugTrackerSystem {
             case "changeStatus" -> new ChangeStatusCommand(input, user);
             case "undoChangeStatus" -> new UndoChangeStatusCommand(input, user);
             case "viewTicketHistory" -> new ViewTicketHistoryCommand(input, user);
-
+            case "viewNotifications" -> new ViewNotificationsCommand(input, user);
             case "lostInvestors" -> new LostInvestorsCommand(input, user);
             default -> throw new IllegalArgumentException("Unknown command " + input.getCommand());
         };

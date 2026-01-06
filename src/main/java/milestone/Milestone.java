@@ -130,7 +130,7 @@ public final class Milestone {
 
         updateTimeMetrics(currentDate, ticketDatabase);
 
-        unblockMilestones(milestoneDatabase, ticketDatabase, userDatabase);
+        unblockMilestones(milestoneDatabase, ticketDatabase, userDatabase, currentDate);
 
         if (this.status.equals(MilestoneStatus.ACTIVE)) {
             updateTicketStatus(currentDate, ticketDatabase, userDatabase);
@@ -283,8 +283,6 @@ public final class Milestone {
             Status currentStatus = Objects.requireNonNull(t.getStatus());
             if (currentStatus == Status.OPEN || currentStatus == Status.IN_PROGRESS) {
                 t.setBusinessPriority(BusinessPriority.CRITICAL);
-                //TODO: SEND NOTIF TO ASSIGNED DEVS
-                //TODO: IF UNBLOCKED AFTER DUEDATE, SEND SPECIAL NOTIFICATION
             }
         }
     }
@@ -307,7 +305,6 @@ public final class Milestone {
             String message = "Milestone " + this.name + " is due tomorrow. "
                     + "All unresolved tickets are now CRITICAL.";
             notifyAssignedDevs(message, userDatabase);
-
             updateToCritical(currentDate, ticketDatabase);
         } else if (daysBetweenCurrDue < 0) {
             updateToCritical(currentDate, ticketDatabase);
@@ -322,7 +319,8 @@ public final class Milestone {
      */
     private void unblockMilestones(final MilestoneDatabase milestoneDatabase,
                                    final TicketDatabase ticketDatabase,
-                                   final UserDatabase userDatabase) {
+                                   final UserDatabase userDatabase,
+                                   final LocalDate currentDate) {
         if (!this.openTickets.isEmpty()) {
             return;
         }
@@ -331,11 +329,27 @@ public final class Milestone {
         Integer ticketId = (lastClosedTicket != null) ? lastClosedTicket.getId() : -1;
 
         for (String milestoneName : this.blockingFor) {
-            Milestone milestone = milestoneDatabase.getMilestoneByName(milestoneName);
-            if (milestone == null) {
-                continue;
+            Milestone blockedMilestone = milestoneDatabase.getMilestoneByName(milestoneName);
+            if (blockedMilestone != null && blockedMilestone.isBlocked) {
+                blockedMilestone.setBlocked(false); // UNLOCK
+                // CHECK FOR WHEN I UNLOCKED IT
+                if (currentDate.isAfter(blockedMilestone.getDueDate())) {
+                    // IF I UNLOCKED AFTER DUE DATE (CURRENT DATE IS AFTER DUEDATE)
+                    String message = "Milestone " + blockedMilestone.getName()
+                            + " was unblocked after due date. All active tickets are now CRITICAL.";
+
+                    blockedMilestone.notifyAssignedDevs(message, userDatabase);
+
+                    blockedMilestone.updateToCritical(currentDate, ticketDatabase);
+                } else {
+                    // NORMALLY UNLOCKED(BEFORE DUEDATE)
+                    String message = "Milestone " + blockedMilestone.getName()
+                            + " is now unblocked as ticket " + ticketId + " has been CLOSED.";
+
+                    blockedMilestone.notifyAssignedDevs(message, userDatabase);
+                }
+
             }
-            milestone.isBlocked = false;
         }
     }
 
