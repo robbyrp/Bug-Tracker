@@ -196,8 +196,39 @@ public abstract class Ticket {
 
     }
 
-    public void addHistory(String action, String username, String timestamp) {
+    /**
+     * Adds an ASSIGNED/DE-ASSIGNED entry to the history list
+     * @param action
+     * @param username
+     * @param timestamp
+     */
+    public void addHistoryAssign(final String action, final String username, final String timestamp) {
         history.add(new TicketAction(action, username, timestamp));
+    }
+
+    /**
+     * Adds a STATUS_CHANGE entry to the history list
+     * @param action
+     * @param from
+     * @param to
+     * @param by
+     * @param timestamp
+     */
+    public void addHistoryStatus(final String action, final String from, final String to,
+                                 final String by, final String timestamp) {
+        history.add(new TicketAction(action, from, to, by, timestamp));
+    }
+
+    /**
+     * Adds an ADDED_TO_MILESTONE entry to the history list
+     * @param action
+     * @param milestone
+     * @param by
+     * @param timestamp
+     */
+    public void addHistoryMilestone(final String action, final String milestone,
+                                    final String by, final String timestamp) {
+        history.add(new TicketAction(action, milestone, by, timestamp));
     }
 
     /**

@@ -3,6 +3,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import command.*;
 import command.addComment.AddCommentCommand;
 import command.viewMilestones.ViewMilestonesCommand;
+import command.viewTicketHistory.ViewTicketHistoryCommand;
 import command.viewTickets.ViewTicketsCommand;
 import enums.ApplicationPhase;
 import enums.Role;
@@ -65,7 +66,7 @@ public final class BugTrackerSystem {
 
             LocalDate currentDate = LocalDate.parse(commandInput.getTimestamp());
             for (Milestone milestone : milestoneDatabase.getMilestoneList()) {
-                milestone.updateMilestone(currentDate, ticketDatabase, milestoneDatabase);
+                milestone.updateMilestone(currentDate, ticketDatabase, milestoneDatabase, userDatabase);
             }
 
             command.execute(this, outputs);
@@ -160,6 +161,9 @@ public final class BugTrackerSystem {
             case "viewAssignedTickets" -> new ViewAssignedTicketsCommand(input, user);
             case "addComment" -> new AddCommentCommand(input, user);
             case "undoAddComment" -> new UndoAddCommentCommand(input, user);
+            case "changeStatus" -> new ChangeStatusCommand(input, user);
+            case "undoChangeStatus" -> new UndoChangeStatusCommand(input, user);
+            case "viewTicketHistory" -> new ViewTicketHistoryCommand(input, user);
 
             case "lostInvestors" -> new LostInvestorsCommand(input, user);
             default -> throw new IllegalArgumentException("Unknown command " + input.getCommand());

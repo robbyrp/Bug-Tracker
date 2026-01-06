@@ -53,7 +53,6 @@ public final class App {
             system.executeCommands(commands, outputs);
 
 
-            // TODO: Process commands here;
         } catch (IOException e) {
             e.printStackTrace();
         }

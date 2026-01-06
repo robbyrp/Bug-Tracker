@@ -6,6 +6,7 @@ import fileio.CommandInput;
 import fileio.OutputFormatter;
 import main.BugTrackerSystem;
 import milestone.Milestone;
+import ticket.Ticket;
 import user.User;
 
 import java.util.List;
@@ -16,6 +17,12 @@ public final class CreateMilestoneCommand extends Command {
         super(input, user);
     }
 
+    /**
+     * Execute method that creates new Milestone, adds it to the database,
+     * adds the event in history and sends notification to assigned devs
+     * @param system The engine of the program
+     * @param outputs output mapper
+     */
     @Override
     public void execute(final BugTrackerSystem system, final List<ObjectNode> outputs) {
         List<Integer> requestedTickets = getCommandInput().getTickets();
@@ -40,7 +47,28 @@ public final class CreateMilestoneCommand extends Command {
 
         Milestone newMilestone = new Milestone(getCommandInput(), system.getMilestoneDatabase());
 
+        for (Integer ticketId : newMilestone.getTickets()) {
+            Ticket ticket = system.getTicketDatabase().getTicketById(ticketId);
+            if (ticket == null) {
+                throw new IllegalArgumentException("Ticket id " + ticketId + " is invalid.") ;
+            }
+            ticket.addHistoryMilestone("ADDED_TO_MILESTONE",
+                    newMilestone.getName(),
+                    newMilestone.getCreatedBy(),
+                    getCommandInput().getTimestamp()
+            );
+        }
         system.getMilestoneDatabase().addMilestone(newMilestone);
+
+        String notification = "New milestone " + newMilestone.getName()
+                + " has been created with due date " + newMilestone.getDueDate() + ".";
+
+        for (String devUsername : newMilestone.getAssignedDevs()) {
+            User dev = system.getUserDatabase().getUsers().get(devUsername);
+            if (dev != null) {
+                dev.update(notification);
+            }
+        }
 
     }
 

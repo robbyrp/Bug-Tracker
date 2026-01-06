@@ -5,7 +5,7 @@ public enum Status {
     IN_PROGRESS("IN_PROGRESS"),
     RESOLVED("RESOLVED"),
     CLOSED("CLOSED"),
-    UNKNOWN("UNKNOWN");
+    UNKNOWN(null);
 
     private final String text;
 

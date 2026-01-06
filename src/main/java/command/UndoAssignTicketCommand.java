@@ -45,7 +45,7 @@ public final class UndoAssignTicketCommand extends  Command {
         ticket.setAssignedTo("");
         ticket.setAssignedAt(null);
 
-        ticket.addHistory("UNASSIGNED", getUser().getUsername(), getCommandInput().getTimestamp());
+        ticket.addHistoryAssign("DE-ASSIGNED", getUser().getUsername(), getCommandInput().getTimestamp());
 
     }
 

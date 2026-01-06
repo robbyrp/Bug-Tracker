@@ -63,12 +63,21 @@ public final class AssignTicketCommand extends Command {
             return;
         }
 
+        Status oldStatus = ticket.getStatus();
         ticket.setStatus(Status.IN_PROGRESS);
+        Status newStatus = ticket.getStatus();
+
         ticket.setAssignedTo(getUser().getUsername());
         LocalDate assignedAt = LocalDate.parse(getCommandInput().getTimestamp());
         ticket.setAssignedAt(assignedAt);
 
-        ticket.addHistory("ASSIGNED", getUser().getUsername(), getCommandInput().getTimestamp());
+        ticket.addHistoryAssign("ASSIGNED", getUser().getUsername(), getCommandInput().getTimestamp());
+        ticket.addHistoryStatus("STATUS_CHANGED",
+                oldStatus.name(),
+                newStatus.name(),
+                getUser().getUsername(),
+                getCommandInput().getTimestamp()
+                );
     }
 
     private boolean checkExpertiseArea(final BugTrackerSystem system,

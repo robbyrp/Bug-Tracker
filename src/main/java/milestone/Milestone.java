@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.Setter;
 import ticket.Ticket;
 import ticket.TicketDatabase;
+import user.User;
+import user.UserDatabase;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -96,6 +98,21 @@ public final class Milestone {
     }
 
     /**
+     * Helper method that sends notifications to all devs
+     * assigned to the calling milestone
+     * @param message
+     * @param userDatabase
+     */
+    private void notifyAssignedDevs(String message, UserDatabase userDatabase) {
+        for (String username : this.assignedDevs) {
+            User user = userDatabase.getUsers().get(username);
+            if (user != null) {
+                user.update(message);
+            }
+        }
+    }
+
+    /**
      * Public method that calls helper methods to update Milestone fields.
      * Updates the Milestone calling the method
      * @param currentDate
@@ -104,26 +121,61 @@ public final class Milestone {
      */
     public void updateMilestone(final LocalDate currentDate,
                                 final TicketDatabase ticketDatabase,
-                                final MilestoneDatabase milestoneDatabase) {
-        // TODO: Verific ce se intampla daca primesc
-        //  mai multe comenzi intr-o singura zi(creste priority)?
+                                final MilestoneDatabase milestoneDatabase,
+                                final UserDatabase userDatabase) {
 
-        updateTimeMetrics(currentDate);
+        boolean milestoneWasCompleted = this.status.equals(MilestoneStatus.COMPLETED);
 
         updateTicketProgress(ticketDatabase);
 
-        unblockMilestones(milestoneDatabase);
+        updateTimeMetrics(currentDate, ticketDatabase);
 
-        updateTicketStatus(currentDate, ticketDatabase);
+        unblockMilestones(milestoneDatabase, ticketDatabase, userDatabase);
+
+        if (this.status.equals(MilestoneStatus.ACTIVE)) {
+            updateTicketStatus(currentDate, ticketDatabase, userDatabase);
+        }
 
     }
 
+
     /**
+     * Helper method that returns the last solved(closed) ticket from
+     * the calling milestone
+     * @param ticketDatabase
+     * @return
+     */
+    private Ticket lastClosedTicket(final TicketDatabase ticketDatabase) {
+        Ticket lastTicket = null;
+        for (Integer ticketId : this.tickets) {
+            Ticket currentTicket = ticketDatabase.getTicketById(ticketId);
+            if (currentTicket != null && currentTicket.getSolvedAt() != null) {
+                if (lastTicket == null || currentTicket.getSolvedAt().isAfter(lastTicket.getSolvedAt())) {
+                    lastTicket = currentTicket;
+                }
+            }
+        }
+        return lastTicket;
+    }
+
+    /**
+     * Helper method for updateTicketStatus
+     * Updates the time metrics. If the milestone is completed,
+     * it uses the completion date of the last ticket
      * Sets the dausUntilDue and overdueBy members
      * @param currentDate
      */
-    private void updateTimeMetrics(final LocalDate currentDate) {
-        int daysBetween = (int) ChronoUnit.DAYS.between(currentDate, dueDate);
+    private void updateTimeMetrics(final LocalDate currentDate, final TicketDatabase ticketDatabase) {
+        LocalDate calculationDate = currentDate;
+
+        if (this.status.equals(MilestoneStatus.COMPLETED)) {
+            Ticket lastTicket = lastClosedTicket(ticketDatabase);
+            if (lastTicket != null) {
+                calculationDate = lastTicket.getSolvedAt();
+            }
+        }
+
+        int daysBetween = (int) ChronoUnit.DAYS.between(calculationDate, dueDate);
 
         if (daysBetween < 0) {
             this.daysUntilDue = 0;
@@ -135,7 +187,9 @@ public final class Milestone {
     }
 
     /**
+     * Helper method for updateTicketStatus
      * Updates the closedTickets and openTickets member lists
+     * Sets the milestone status to completed if necessary
      * Calculates and sets the completionPercentage
      * Actualizes the repartition and sorts it
      * @param ticketDatabase
@@ -155,7 +209,7 @@ public final class Milestone {
                 continue;
             }
 
-            if (t.getStatus() == Status.CLOSED || t.getStatus() == Status.RESOLVED) {
+            if (t.getStatus() == Status.CLOSED) {
                 this.closedTickets.add(ticketId);
             } else {
                 this.openTickets.add(ticketId);
@@ -172,11 +226,15 @@ public final class Milestone {
             }
         }
 
+        if (!tickets.isEmpty() && openTickets.isEmpty()) {
+            this.status = MilestoneStatus.COMPLETED;
+        }
+
         if (tickets.isEmpty()) {
-            this.completionPercentage = MAX_PERCENTAGE;
+            this.completionPercentage = 1.0;
         } else {
-            this.completionPercentage = (double) closedTickets.size()
-                    / tickets.size() * MAX_PERCENTAGE;
+            double ratio = (double) closedTickets.size() / tickets.size();
+            this.completionPercentage = Math.floor(ratio * 100) / 100.0;
         }
 
         Collections.sort(this.repartition);
@@ -235,7 +293,8 @@ public final class Milestone {
      * Updates the milestone's tickets' statuses every three days
      * @param currentDate the date when calling the update method
      */
-    public void updateTicketStatus(final LocalDate currentDate, final TicketDatabase ticketDatabase) {
+    public void updateTicketStatus(final LocalDate currentDate, final TicketDatabase ticketDatabase,
+                                   final UserDatabase userDatabase) {
         if (this.isBlocked) {
             return;
         }
@@ -243,27 +302,33 @@ public final class Milestone {
         incrementTicketPriority(currentDate, ticketDatabase);
 
         int daysBetweenCurrDue = (int) ChronoUnit.DAYS.between(currentDate, this.dueDate);
-        boolean dueDatePassed = daysBetweenCurrDue < 0;
-        if (daysBetweenCurrDue == 1 || dueDatePassed) {
+
+        if (daysBetweenCurrDue == 1) {
+            String message = "Milestone " + this.name + " is due tomorrow. "
+                    + "All unresolved tickets are now CRITICAL.";
+            notifyAssignedDevs(message, userDatabase);
+
+            updateToCritical(currentDate, ticketDatabase);
+        } else if (daysBetweenCurrDue < 0) {
             updateToCritical(currentDate, ticketDatabase);
         }
-    }
 
-    /**
-     * Atenție!
-     * Un milestone este deblocat în momentul în care ultimul tichet
-     * din milestone-ul blocant devine CLOSED.
-     */
+    }
 
     /**
      * If all tickets in milestone are closed, unblock milestones in
      * blockingFor field
      * @param milestoneDatabase
      */
-    private void unblockMilestones(final MilestoneDatabase milestoneDatabase) {
+    private void unblockMilestones(final MilestoneDatabase milestoneDatabase,
+                                   final TicketDatabase ticketDatabase,
+                                   final UserDatabase userDatabase) {
         if (!this.openTickets.isEmpty()) {
             return;
         }
+
+        Ticket lastClosedTicket = lastClosedTicket(ticketDatabase);
+        Integer ticketId = (lastClosedTicket != null) ? lastClosedTicket.getId() : -1;
 
         for (String milestoneName : this.blockingFor) {
             Milestone milestone = milestoneDatabase.getMilestoneByName(milestoneName);
@@ -274,5 +339,6 @@ public final class Milestone {
         }
     }
 
-    //TODO: bug-urile din milestone-ul blocat nu pot fi rezolvate sau preluate de un developer
+    //TODO: Dacă un tichet este redeschis dintr-un milestone anterior blocant,
+    // milestone-urile deblocate ramân deblocate.
 }

@@ -8,7 +8,7 @@ import fileio.OutputFormatter;
 import main.BugTrackerSystem;
 import ticket.Ticket;
 import user.User;
-import utils.AssignedTicketDTO;
+import fileio.AssignedTicketDTO;
 
 import java.util.ArrayList;
 import java.util.Comparator;

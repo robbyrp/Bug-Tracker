@@ -64,11 +64,10 @@ public final class TicketFactory {
         builder.type(TicketType.fromString(input.getType()))
                 .title(input.getTitle())
                 .businessPriority(BusinessPriority.fromString(input.getBusinessPriority()))
-                .status(Status.fromString(input.getStatus()))
+                .status(Status.OPEN)
                 .expertiseArea(ExpertiseArea.fromString(input.getExpertiseArea()))
                 .reportedBy(input.getReportedBy())
                 .description(input.getDescription())
                 .build();
-        //TODO: ADD A WAY FOR TICKET BUILDER TO BUILD  REPORTEDTIMESTAMP MEMBER
     }
 }

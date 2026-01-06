@@ -49,7 +49,8 @@ public final class UndoAddCommentCommand extends Command {
 
         while (iterator.hasPrevious()) {
             Comment currentComment = iterator.previous();
-            if (currentComment.getAuthor().equals(getUser().getUsername())) {
+            if (currentComment.getAuthor().equals(getUser().getUsername())
+                    && !currentComment.getContent().isEmpty()) {
                 iterator.remove();
                 break;
             }
