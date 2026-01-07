@@ -1,15 +1,22 @@
 package ticket;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import enums.BusinessValue;
+import lombok.Getter;
 
+@Getter
 public final class UiRequest extends Ticket {
-
+    @JsonIgnore
     private BusinessValue businessValue;
+    @JsonIgnore
     private int usabilityScore;
 
     // Optional fields
+    @JsonIgnore
     private String uiElementId;
+    @JsonIgnore
     private String screenshotUrl;
+    @JsonIgnore
     private String suggestedFix;
 
     private UiRequest(final UiRequestBuilder builder) {

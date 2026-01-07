@@ -1,6 +1,8 @@
 package main;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import command.*;
+import command.ReportCommands.CustomerImpactReportCommand;
+import command.ReportCommands.GenerateTicketRiskReportCommand;
 import command.addComment.AddCommentCommand;
 import command.viewMilestones.ViewMilestonesCommand;
 import command.viewTicketHistory.ViewTicketHistoryCommand;
@@ -13,7 +15,6 @@ import fileio.CommandInput;
 import fileio.OutputFormatter;
 import lombok.Getter;
 import lombok.Setter;
-import milestone.Milestone;
 import milestone.MilestoneDatabase;
 import milestone.MilestoneManager;
 import ticket.TicketDatabase;
@@ -167,6 +168,8 @@ public final class BugTrackerSystem {
             case "viewTicketHistory" -> new ViewTicketHistoryCommand(input, user);
             case "viewNotifications" -> new ViewNotificationsCommand(input, user);
             case "lostInvestors" -> new LostInvestorsCommand(input, user);
+            case "generateCustomerImpactReport" -> new CustomerImpactReportCommand(input, user);
+            case "generateTicketRiskReport" -> new GenerateTicketRiskReportCommand(input, user);
             default -> throw new IllegalArgumentException("Unknown command " + input.getCommand());
         };
     }

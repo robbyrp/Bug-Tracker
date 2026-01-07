@@ -1,17 +1,25 @@
 package ticket;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import enums.Frequency;
 import enums.Severity;
+import lombok.Getter;
 
+@Getter
 public final class Bug extends Ticket {
-
+    @JsonIgnore
     private String expectedBehavior;
+    @JsonIgnore
     private String actualBehavior;
+    @JsonIgnore
     private Frequency frequency;
+    @JsonIgnore
     private Severity severity;
 
     // Optional fields
+    @JsonIgnore
     private String environment;
+    @JsonIgnore
     private Integer errorCode; // Wrapper so that i can check if bug.errorcode != null
 
 

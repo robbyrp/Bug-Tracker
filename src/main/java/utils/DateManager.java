@@ -1,5 +1,6 @@
 package utils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import enums.ApplicationPhase;
 import lombok.Getter;
 
@@ -10,8 +11,9 @@ public final class DateManager {
 
     @Getter
     private ApplicationPhase currentPhase = ApplicationPhase.TESTING;
-
+    @JsonIgnore
     private LocalDate lastTestingStartDate = null;
+    @JsonIgnore
     private static final int TESTING_PHASE_DURATION = 12;
 
     /**

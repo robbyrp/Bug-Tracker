@@ -1,11 +1,15 @@
 package ticket;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import enums.BusinessValue;
 import enums.CustomerDemand;
+import lombok.Getter;
 
+@Getter
 public final class FeatureRequest extends Ticket {
-
+    @JsonIgnore
     private BusinessValue businessValue;
+    @JsonIgnore
     private CustomerDemand customerDemand;
 
     private FeatureRequest(final FeatureRequestBuilder builder) {
