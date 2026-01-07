@@ -1,4 +1,9 @@
-For the ticket class and inheritance line, I have used a builder pattern with generics( for inheritance). 
+The four main design patterns that I used are : Factory, Builder, Command and Strategu
+
+
+For the ticket class and inheritance line, I have used a builder pattern with generics
+(for inheritance -> https://www.baeldung.com/java-builder-pattern-inheritance). 
+
 Since the moment I saw optional fields, my mind flew to builder, also because I wanted to practice using it more.
 For the users hierarchy, I've seen no reason to implement builder as there are too few fields to bother with it.
 
@@ -18,13 +23,16 @@ criteria for comparison.
 The class ViewTicketsCommand implements the sorting using an anonymous class inside the
 execute() method.
 
-For some strategies, like ViewMilestones, i used functional programming, because I wanted to get familiar to using streams(and why not, for bonus)
+For some strategies or classes, like ViewMilestones and AppStabilityReport, I used functional programming,
+because I wanted to get familiar with using streams(and why not, for bonus)
 
-Because of the stupid checkstyle that says 'parameter' hides a field i added an s to all those parameters.
+Because of the stupid checkstyle that says 'parameter' hides a field i added an s to all parameters in builders.
 
 
 
 LLM's use: 
 Would it have more sense for this method to be protected rather than private?
 I used the LLM to configure a static block in order to corectly display the timestamp format
+
+
 https://www.baeldung.com/java-builder-pattern-inheritance

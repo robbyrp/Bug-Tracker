@@ -22,9 +22,9 @@ import java.util.Map;
 
 public class CustomerImpactReportCommand extends AbstractReportCommand {
 
-    private static final double MAX_BUG_IMPACT = 48.0;
-    private static final double MAX_FEATURE_IMPACT = 100.0;
-    private static final double MAX_UI_IMPACT = 100.0;
+    private static final double BUG_IMPACT = 48.0;
+    private static final double FEATURE_IMPACT = 100.0;
+    private static final double UI_IMPACT = 100.0;
 
     public CustomerImpactReportCommand(final CommandInput input, final User user) {
         super(input, user);
@@ -100,30 +100,44 @@ public class CustomerImpactReportCommand extends AbstractReportCommand {
         ));
     }
 
-
+    /**
+     * Applies formula to calculate specific parameter
+     * @param bug
+     * @return
+     */
     private double calculateBugImpact(final Bug bug) {
-        int freq = ReportScoreDatabase.getFrequencyScore(bug.getFrequency());
-        int prio = ReportScoreDatabase.getPriorityScore(bug.getBusinessPriority());
-        int sev = ReportScoreDatabase.getSeverityScore(bug.getSeverity());
+        int frequency = ReportScoreDatabase.getFrequencyScore(bug.getFrequency());
+        int priority = ReportScoreDatabase.getPriorityScore(bug.getBusinessPriority());
+        int severity = ReportScoreDatabase.getSeverityScore(bug.getSeverity());
 
-        double rawScore = (double) freq * prio * sev;
-        return normalize(rawScore, MAX_BUG_IMPACT);
+        double rawScore = (double) frequency * priority * severity;
+        return normalize(rawScore, BUG_IMPACT);
     }
 
+    /**
+     * Applies formula to calculate specific parameter
+     * @param fr
+     * @return
+     */
     private double calculateFeatureImpact(final FeatureRequest fr) {
         int val = ReportScoreDatabase.getBusinessValueScore(fr.getBusinessValue());
         int demand = ReportScoreDatabase.getCustomerDemandScore(fr.getCustomerDemand());
 
         double rawScore = (double) val * demand;
-        return normalize(rawScore, MAX_FEATURE_IMPACT);
+        return normalize(rawScore, FEATURE_IMPACT);
     }
 
+    /**
+     * Applies formula to calculate specific parameter
+     * @param uiRequest
+     * @return
+     */
     private double calculateUiImpact(final UiRequest uiRequest) {
         int val = ReportScoreDatabase.getBusinessValueScore(uiRequest.getBusinessValue());
         int usability = uiRequest.getUsabilityScore();
 
         double rawScore = (double) val * usability;
-        return normalize(rawScore, MAX_UI_IMPACT);
+        return normalize(rawScore, UI_IMPACT);
     }
 
 }

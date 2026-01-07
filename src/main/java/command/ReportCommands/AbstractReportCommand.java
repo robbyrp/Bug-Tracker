@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractReportCommand extends Command {
+
     protected static final double NORMALIZE_FACTOR = 100.0;
 
     public AbstractReportCommand(final CommandInput input, final User user) {
