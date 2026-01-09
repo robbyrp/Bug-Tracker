@@ -35,7 +35,6 @@ public final class ReportTicketCommand extends Command {
 
     @Override
     public void execute(final BugTrackerSystem system, final List<ObjectNode> outputs) {
-        //TODO: CHECK PENTRU DEPASIRE PERIOADA DE TESTARE SI RAPORTARE ANONIMA
         TicketInput ticketInputParams = getCommandInput().getParams();
 
         if (Objects.equals(ticketInputParams.getReportedBy(), "")) {

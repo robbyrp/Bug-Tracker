@@ -5,6 +5,7 @@ import command.ReportCommands.AppStabilityReportCommand;
 import command.ReportCommands.CustomerImpactReportCommand;
 import command.ReportCommands.GenerateTicketRiskReportCommand;
 import command.ReportCommands.ResolutionEfficiencyReportCommand;
+import command.ReportCommands.PerformanceReportCommand;
 import command.addComment.AddCommentCommand;
 import command.viewMilestones.ViewMilestonesCommand;
 import command.viewTicketHistory.ViewTicketHistoryCommand;
@@ -174,7 +175,7 @@ public final class BugTrackerSystem {
             case "generateTicketRiskReport" -> new GenerateTicketRiskReportCommand(input, user);
             case "generateResolutionEfficiencyReport" -> new ResolutionEfficiencyReportCommand(input, user);
             case "appStabilityReport" -> new AppStabilityReportCommand(input, user);
-//            case "generatePerformanceReport" -> new PerformanceReport(input, user);
+            case "generatePerformanceReport" -> new PerformanceReportCommand(input, user);
             default -> throw new IllegalArgumentException("Unknown command " + input.getCommand());
         };
     }

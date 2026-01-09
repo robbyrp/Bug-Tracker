@@ -3,6 +3,8 @@ package fileio;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+
 @Data
 @NoArgsConstructor
 public final class UserInput {
@@ -14,6 +16,6 @@ public final class UserInput {
     private String expertiseArea;
     private String seniority;
 
-    private String[] subordinates;
+    private ArrayList<String> subordinates;
 
 }

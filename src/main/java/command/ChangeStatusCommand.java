@@ -50,10 +50,15 @@ public final class ChangeStatusCommand extends Command {
         String newStatus = ticket.getStatus().name();
 
         LocalDate currentDate = LocalDate.parse(getCommandInput().getTimestamp());
-        if (ticket.getStatus().equals(Status.CLOSED)
-        || ticket.getStatus().equals(Status.RESOLVED)) {
-            ticket.setSolvedAt(currentDate);
+
+        if (ticket.getStatus().equals(Status.RESOLVED) || ticket.getStatus().equals(Status.CLOSED)) {
+//            if (ticket.getSolvedAt() == null) {
+                ticket.setSolvedAt(currentDate);
+//            }
+        } else if (ticket.getStatus().equals(Status.IN_PROGRESS) || ticket.getStatus().equals(Status.OPEN)) {
+            ticket.setSolvedAt(null);
         }
+
 
         ticket.addHistoryStatus("STATUS_CHANGED",
                 oldStatus,

@@ -30,10 +30,8 @@ public final class UndoChangeStatusCommand extends Command {
     }
 
     /**
-     * Execute method that iterates the list of history list from end to start.
-     * Since the list is implemented as an ArrayList, the insertion order is kept.
-     * The last entries in the list are the most recent, and that's where
-     * the deletion takes place
+     * Execute method that undoes the last changeStatus.
+     * If ticket goes from RESOLVED -> IN_PROGRESS, solvedAt is reset to null
      * @param system The engine of the program
      * @param outputs output mapper
      */
@@ -47,7 +45,8 @@ public final class UndoChangeStatusCommand extends Command {
         if (!checkTicket(system, outputs, ticket, getUser())) {
             return;
         }
-        if (ticket.getStatus().equals(Status.IN_PROGRESS)) {
+        if (ticket.getStatus().equals(Status.IN_PROGRESS)
+                || ticket.getStatus().equals(Status.OPEN)) {
             return;
         }
 
@@ -63,6 +62,10 @@ public final class UndoChangeStatusCommand extends Command {
         }
 
         ticket.setStatus(prevStatus);
+        if (prevStatus.equals(Status.IN_PROGRESS)) {
+            ticket.setSolvedAt(null);
+        }
+
 
         ticket.addHistoryStatus(
                 "STATUS_CHANGED",
