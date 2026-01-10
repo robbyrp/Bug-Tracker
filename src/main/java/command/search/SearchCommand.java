@@ -20,7 +20,7 @@ public class SearchCommand extends Command {
 
     @Override
     public ApplicationPhase getRequiredPhase() {
-        return ApplicationPhase.DEVELOPMENT;
+        return null;
     }
     @Override
     public List<Role> getRequiredRoles() {

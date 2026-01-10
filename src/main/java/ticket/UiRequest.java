@@ -94,8 +94,5 @@ public final class UiRequest extends Ticket {
             return self();
         }
 
-        public boolean canBeAnonymous() {
-            return false;
-        }
     }
 }

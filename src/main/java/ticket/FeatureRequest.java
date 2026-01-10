@@ -52,9 +52,6 @@ public final class FeatureRequest extends Ticket {
             return self();
         }
 
-        public boolean canBeAnonymous() {
-            return false;
-        }
 
     }
 

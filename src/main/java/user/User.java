@@ -13,7 +13,9 @@ import java.util.List;
 @Getter @Setter
 public abstract class User implements Subscriber {
     private String username;
+    @JsonIgnore
     private String email;
+    @JsonIgnore
     private Role role;
 
     @JsonIgnore

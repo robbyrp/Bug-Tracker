@@ -5,6 +5,7 @@ import enums.*;
 import fileio.CommandInput;
 import fileio.FilterInput;
 import fileio.OutputFormatter;
+import fileio.SearchedTicketDTO;
 import main.BugTrackerSystem;
 import milestone.Milestone;
 import ticket.Ticket;
@@ -12,6 +13,7 @@ import user.Developer;
 import user.User;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -19,7 +21,7 @@ import java.util.stream.Stream;
 public class DeveloperSearchStrategy implements SearchStrategy {
 
     /**
-     * Search method that applies filters by filtering the stream of tickets
+     * Search method that applies filterss by filtersing the stream of tickets
      * with predicates
      * @param system
      * @param user
@@ -30,72 +32,59 @@ public class DeveloperSearchStrategy implements SearchStrategy {
     public void executeSearch(final BugTrackerSystem system, final List<ObjectNode> outputs,
                               final User user, final CommandInput input) {
 
-        FilterInput filter = input.getFilters();
+        FilterInput filters = input.getFilters();
         List<Ticket> allTickets = system.getTicketDatabase().getTickets();
         Stream<Ticket> ticketStream = allTickets.stream();
 
-        ticketStream = ticketStream.filter(ticket -> ticket.getStatus().equals(Status.OPEN))
-                                    .filter(ticket -> isTicketInMilestoneAssignedToDev(system, ticket, user));
-
-        if (filter.getBusinessPriority() != null) {
+        if (filters.getBusinessPriority() != null) {
             ticketStream = ticketStream.filter(ticket ->
-                    ticket.getBusinessPriority().name().equals(filter.getBusinessPriority()));
+                    ticket.getBusinessPriority().name().equals(filters.getBusinessPriority()));
         }
 
-        if (filter.getType() != null) {
-            ticketStream = ticketStream.filter(ticket -> ticket.getType().name().equals(filter.getType()));
+        if (filters.getType() != null) {
+            ticketStream = ticketStream.filter(ticket -> ticket.getType().name().equals(filters.getType()));
         }
 
-        if (filter.getCreatedAt() != null) {
-            LocalDate filterCreatedAt = LocalDate.parse(filter.getCreatedAt());
-            ticketStream = ticketStream.filter(ticket -> ticket.getReportedTimestamp().equals(filterCreatedAt));
+        if (filters.getCreatedAt() != null) {
+            LocalDate filtersCreatedAt = LocalDate.parse(filters.getCreatedAt());
+            ticketStream = ticketStream.filter(ticket -> ticket.getReportedTimestamp().equals(filtersCreatedAt));
         }
 
-        if (filter.getCreatedBefore() != null) {
-            LocalDate filterCreatedBefore = LocalDate.parse(filter.getCreatedBefore());
-            ticketStream = ticketStream.filter(ticket -> ticket.getReportedTimestamp().isBefore(filterCreatedBefore));
+        if (filters.getCreatedBefore() != null) {
+            LocalDate filtersCreatedBefore = LocalDate.parse(filters.getCreatedBefore());
+            ticketStream = ticketStream.filter(ticket -> ticket.getReportedTimestamp().isBefore(filtersCreatedBefore));
         }
 
-        if (filter.getCreatedAfter() != null) {
-            LocalDate filterCreatedAfter = LocalDate.parse(filter.getCreatedAfter());
-            ticketStream = ticketStream.filter(ticket -> ticket.getReportedTimestamp().isAfter(filterCreatedAfter));
+        if (filters.getCreatedAfter() != null) {
+            LocalDate filtersCreatedAfter = LocalDate.parse(filters.getCreatedAfter());
+            ticketStream = ticketStream.filter(ticket -> ticket.getReportedTimestamp().isAfter(filtersCreatedAfter));
         }
 
-        if (filter.isAvailableForAssignment()) {
+//        if (filters.isAvailableForAssignment()) {
             ticketStream = ticketStream.filter(ticket -> isTicketAvailForAssignment(system, ticket, user));
-        }
+//        }
 
-        List<Ticket> results = ticketStream
+        List<Ticket> sortedTickets = ticketStream
                 .sorted(Comparator.comparing(Ticket::getReportedTimestamp).thenComparing(Ticket::getId))
                 .toList();
 
-        outputs.add(OutputFormatter.createListResponse(
+        List<SearchedTicketDTO> dtos = new ArrayList<>();
+        for (Ticket ticket : sortedTickets) {
+            SearchedTicketDTO dto = new SearchedTicketDTO(ticket);
+            dtos.add(dto);
+        }
+
+
+        outputs.add(OutputFormatter.createSearchResponse(
                 input.getCommand(),
                 user.getUsername(),
                 input.getTimestamp(),
-                "results",
-                results
+                filters.getSearchType(),
+                dtos
         ));
 
     }
 
-    /**
-     * Returns true if user is assigned to the ticket's milestone and false otherwise
-     * @param system
-     * @param ticket
-     * @param user
-     * @return
-     */
-    private boolean isTicketInMilestoneAssignedToDev(final BugTrackerSystem system, final Ticket ticket, final User user) {
-        for (Milestone milestone : system.getMilestoneDatabase().getMilestoneList()) {
-            if (milestone.getTickets().contains(ticket.getId())) {
-                if (milestone.getAssignedDevs().contains(user.getUsername())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     /**
      * Returns true if ticket is avail for assignment(checks the 5 rules at assignTicket)
@@ -128,7 +117,7 @@ public class DeveloperSearchStrategy implements SearchStrategy {
         }
 
         // Ticket status check
-        if (ticket.getStatus() != Status.OPEN) {
+        if (!ticket.getStatus().equals(Status.OPEN)) {
             return false;
         }
 

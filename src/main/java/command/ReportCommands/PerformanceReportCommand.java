@@ -133,6 +133,7 @@ public class PerformanceReportCommand extends Command {
             devReport.put("seniority", developer.getSeniority().name());
 
             reportList.add(devReport);
+            developer.setPerformanceScore(round(performanceScore));
         }
 
         outputs.add(OutputFormatter.createListResponse(

@@ -111,10 +111,6 @@ public final class Bug extends Ticket {
             return self();
         }
 
-        public boolean canBeAnonymous() {
-            return true;
-        }
-
 
     }
 

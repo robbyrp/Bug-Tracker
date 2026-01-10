@@ -33,7 +33,7 @@ import java.util.List;
         "comments",
         "description"
 })
-public abstract class Ticket {
+public class Ticket {
     protected int id;
     protected TicketType type;
     protected String title;
@@ -78,6 +78,27 @@ public abstract class Ticket {
         this.expertiseArea = b.expertiseArea;
         this.reportedBy = b.reportedBy;
         this.reportedTimestamp = b.reportedTimestamp;
+    }
+
+    /**
+     * Copy constructor
+     * @param t
+     */
+    public Ticket(Ticket t) {
+        this.id = t.id;
+        this.type = t.type;
+        this.title = t.title;
+        this.businessPriority = t.businessPriority;
+        this.status = t.status;
+        this.reportedTimestamp = t.reportedTimestamp;
+        this.assignedAt = t.assignedAt;
+        this.solvedAt = t.solvedAt;
+        this.assignedTo = t.assignedTo;
+        this.reportedBy = t.reportedBy;
+        this.comments = t.comments;
+        this.expertiseArea = t.expertiseArea;
+        this.description = t.description;
+        this.history = t.history;
     }
 
     // T represents the future builder(inner class) of Ticket's children, for example Bug.BugBuilder
@@ -191,8 +212,6 @@ public abstract class Ticket {
          * @return
          */
         public abstract Ticket build() ;
-
-        public abstract boolean canBeAnonymous();
 
     }
 

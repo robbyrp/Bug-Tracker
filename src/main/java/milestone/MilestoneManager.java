@@ -107,7 +107,7 @@ public final class MilestoneManager {
             m.setCompletionPercentage(MAX_COMPL_PERCENTAGE);
         } else {
             double ratio = (double) m.getClosedTickets().size() / m.getTickets().size();
-            double completionPercentage = Math.floor(ratio * ROUNDING_VALUE) / ROUNDING_VALUE;
+            double completionPercentage = Math.round(ratio * ROUNDING_VALUE) / ROUNDING_VALUE;
             m.setCompletionPercentage(completionPercentage);
         }
 
@@ -136,6 +136,7 @@ public final class MilestoneManager {
         }
 
         int daysBetween = (int) ChronoUnit.DAYS.between(calculationDate, m.getDueDate());
+
         if (daysBetween < 0) {
             m.setDaysUntilDue(0);
             m.setOverdueBy(Math.abs(daysBetween) + 1);
@@ -147,7 +148,10 @@ public final class MilestoneManager {
 
     /** Helper method for processMilestone.
      * If all tickets in milestone are closed, unblock milestones in
-     * blockingFor field and send notifications
+     * blockingFor field and send notifications.
+     * Sets the lastPriorityUpdate flag to the current date, so that
+     * ticket priorities can be incremented properly every 3 days
+     *
      * @param m
      * @param milestoneDatabase
      * @param ticketDatabase
@@ -170,6 +174,7 @@ public final class MilestoneManager {
         for (Milestone blockedMilestone : blockedMilestones) {
             if (blockedMilestone.isBlocked()) {
                 blockedMilestone.setBlocked(false);
+                blockedMilestone.setLastPriorityUpdateDate(currentDate);
 
                 if (currentDate.isAfter(blockedMilestone.getDueDate())) {
                     String msg = "Milestone " + blockedMilestone.getName() +
@@ -197,12 +202,16 @@ public final class MilestoneManager {
                                              final TicketDatabase ticketDatabase,
                                              final UserDatabase userDatabase,
                                              final LocalDate currentDate) {
-        if (m.getLastPriorityUpdateDate() == null || currentDate.isAfter(m.getLastPriorityUpdateDate())) {
-            int daysSinceStart = (int) ChronoUnit.DAYS.between(m.getCreatedAt(), currentDate) + 1;
 
-            if (daysSinceStart % DAYS_BETWEEN_UPDATES == 1 && daysSinceStart != 1) {
-                incrementPriorities(m, ticketDatabase);
-            }
+        if (m.getLastPriorityUpdateDate() == null) {
+            m.setLastPriorityUpdateDate(m.getCreatedAt());
+        }
+
+        // removed +1
+        int daysSinceLastUpdate = (int) ChronoUnit.DAYS.between(m.getLastPriorityUpdateDate(), currentDate);
+
+         if (daysSinceLastUpdate >= DAYS_BETWEEN_UPDATES) {
+            incrementPriorities(m, ticketDatabase);
             m.setLastPriorityUpdateDate(currentDate);
         }
 
@@ -242,9 +251,13 @@ public final class MilestoneManager {
     private void forceCritical(final Milestone m, final TicketDatabase ticketDatabase) {
         for(Integer id : m.getTickets()) {
             Ticket t = ticketDatabase.getTicketById(id);
-            if(t != null && (t.getStatus() == Status.OPEN || t.getStatus() == Status.IN_PROGRESS)) {
-                t.setBusinessPriority(BusinessPriority.CRITICAL);
+            if (t != null) {
+                boolean ticketClosed = t.getStatus().equals(Status.CLOSED);
+                if (!ticketClosed) {
+                    t.setBusinessPriority(BusinessPriority.CRITICAL);
+                }
             }
+
         }
     }
 

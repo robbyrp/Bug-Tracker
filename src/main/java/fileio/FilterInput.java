@@ -3,6 +3,8 @@ package fileio;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+
 @Setter @Getter
 public final class FilterInput {
     private String searchType;
@@ -15,7 +17,7 @@ public final class FilterInput {
     private boolean availableForAssignment;
 
     // Manager filters: all of the above +
-    private String[] keywords; // este case-insensitive și caută potrivirea parțială sau completă a cel puțin un cuvânt în description sau title.
+    private ArrayList<String> keywords; // este case-insensitive și caută potrivirea parțială sau completă a cel puțin un cuvânt în description sau title.
     private String expertiseArea;
     private String seniority;
     private Integer performanceScoreAbove;

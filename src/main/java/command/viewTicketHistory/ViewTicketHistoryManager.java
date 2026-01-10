@@ -27,7 +27,6 @@ public class ViewTicketHistoryManager implements ViewTicketHistoryStrategy {
                     managerTickets.add(ticket);
                 }
             }
-            //TODO: Verifica, poate e nevoie sa iterezi si prin milestone.getClosed()
         }
         return managerTickets;
     }

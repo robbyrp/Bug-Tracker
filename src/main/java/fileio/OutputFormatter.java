@@ -1,5 +1,6 @@
 package fileio;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -20,6 +21,7 @@ public final class OutputFormatter {
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
+
     /**
      * Helper method for common header
      * @param command
@@ -52,9 +54,8 @@ public final class OutputFormatter {
         return node;
     }
 
-
     /**
-     * Method for List[] message
+     * Standard list  for most commands' outputs
      * @param command
      * @param username
      * @param timestamp
@@ -73,7 +74,7 @@ public final class OutputFormatter {
     }
 
     /**
-     * Method for response message
+     * Method for report output
      * @param command
      * @param username
      * @param timestamp
@@ -90,4 +91,39 @@ public final class OutputFormatter {
 
         return node;
     }
+
+    /**
+     * Method for search output
+     * @param command
+     * @param username
+     * @param timestamp
+     * @param searchType
+     * @param results
+     * @return
+     */
+    public static ObjectNode createSearchResponse(final String command,
+                                                  final String username,
+                                                  final String timestamp,
+                                                  final String searchType,
+                                                  final List<?> results) {
+        ObjectNode node = createBaseNode(command, username, timestamp);
+
+        if (searchType != null) {
+            node.put("searchType", searchType);
+        }
+
+        node.set("results", mapper.valueToTree(results));
+
+        return node;
+    }
+
+    /**
+     * Converts generic object to jsonNode
+     * @param object
+     * @return
+     */
+    public static JsonNode mapToNode(final Object object) {
+        return mapper.valueToTree(object);
+    }
+
 }
