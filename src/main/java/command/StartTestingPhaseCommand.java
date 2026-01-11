@@ -13,7 +13,7 @@ import user.User;
 import java.time.LocalDate;
 import java.util.List;
 
-public class StartTestingPhaseCommand extends Command {
+public final class StartTestingPhaseCommand extends Command {
     public StartTestingPhaseCommand(final CommandInput input, final User user) {
         super(input, user);
     }
@@ -25,20 +25,31 @@ public class StartTestingPhaseCommand extends Command {
 
     @Override
     public ApplicationPhase getRequiredPhase() {
-        return ApplicationPhase.DEVELOPMENT;
+        return null;
     }
 
     @Override
     public void execute(final BugTrackerSystem system, final List<ObjectNode> outputs) {
+
+        LocalDate currentDate = LocalDate.parse(getCommandInput().getTimestamp());
+
+        system.getMilestoneManager().updateAllMilestones(
+                system.getMilestoneDatabase(),
+                system.getTicketDatabase(),
+                system.getUserDatabase(),
+                currentDate
+        );
+
         for (Milestone milestone : system.getMilestoneDatabase().getMilestoneList()) {
             if (milestone.getStatus().equals(MilestoneStatus.ACTIVE)) {
+                 System.out.println("DEBUG: Milestone activ blocant: " + milestone.getName());
                 String error = "Cannot start a new testing phase.";
                 outputs.add(OutputFormatter.createError(
                         getCommandInput().getCommand(),
                         getCommandInput().getUsername(),
                         getCommandInput().getTimestamp(),
                         error
-                        ));
+                ));
                 return;
             }
         }

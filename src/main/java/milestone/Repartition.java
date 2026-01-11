@@ -39,7 +39,7 @@ public final class Repartition implements Comparable<Repartition> {
      * @return
      */
     @Override
-    public int compareTo(Repartition other) {
+    public int compareTo(final Repartition other) {
         int sizeComparison =
                 Integer.compare(this.assignedTickets.size(), other.assignedTickets.size());
 

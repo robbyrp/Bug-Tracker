@@ -1,4 +1,4 @@
-package command.ReportCommands;
+package command.reportCommands;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import enums.Status;
@@ -26,6 +26,13 @@ public class AppStabilityReportCommand extends AbstractReportCommand {
     private static final double BUG_IMPACT = 48.0;
     private static final double FEATURE_IMPACT = 100.0;
     private static final double UI_IMPACT = 100.0;
+
+    private static final int NEGLIGIBLE_CAP = 25;
+    private static final int MODERATE_CAP = 50;
+    private static final int SIGNIFICANT_CAP = 75;
+
+    private static final double USABILITY_PARAM = 11.0;
+
 
     public AppStabilityReportCommand(final CommandInput input, final User user) {
         super(input, user);
@@ -81,6 +88,9 @@ public class AppStabilityReportCommand extends AbstractReportCommand {
                     uiRisks.add(calculateUiRisk(ui));
                     uiImpacts.add(calculateUiImpact(ui));
                     break;
+
+                default:
+                    break;
             }
         }
 
@@ -134,7 +144,7 @@ public class AppStabilityReportCommand extends AbstractReportCommand {
      * @return
      */
     private String determineStability(final int totalTickets, final Map<String,
-             String> risks, final Map<String, Double> impacts) {
+            String> risks, final Map<String, Double> impacts) {
         if (totalTickets == 0) {
             return "STABLE";
         }
@@ -143,7 +153,7 @@ public class AppStabilityReportCommand extends AbstractReportCommand {
                 .allMatch(label -> label.equals("NEGLIGIBLE"));
 
         boolean allImpactsLow = impacts.values().stream()
-                .allMatch(score -> score < 50.0);
+                .allMatch(score -> score < MODERATE_CAP);
 
         boolean anyRiskSignificantOrMajor = risks.values().stream()
                 .anyMatch(label -> label.equals("SIGNIFICANT") || label.equals("MAJOR"));
@@ -165,13 +175,13 @@ public class AppStabilityReportCommand extends AbstractReportCommand {
      * @return
      */
     private String getRiskLabel(final double score) {
-        if (score < 25.0) {
+        if (score < NEGLIGIBLE_CAP) {
             return "NEGLIGIBLE";
         }
-        if (score < 50.0) {
+        if (score < MODERATE_CAP) {
             return "MODERATE";
         }
-        if (score < 75.0) {
+        if (score < SIGNIFICANT_CAP) {
             return "SIGNIFICANT";
         }
         return "MAJOR";
@@ -208,7 +218,7 @@ public class AppStabilityReportCommand extends AbstractReportCommand {
     private double calculateUiRisk(final UiRequest ui) {
         int value = ReportScoreDatabase.getBusinessValueScore(ui.getBusinessValue());
         int usability = ui.getUsabilityScore();
-        return normalize((11.0 - usability) * value, UI_RISK);
+        return normalize((USABILITY_PARAM - usability) * value, UI_RISK);
     }
 
 

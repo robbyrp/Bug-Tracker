@@ -25,19 +25,19 @@ public abstract class User implements Subscriber {
      * Smart constructor for parent class' fields only
      * @param input
      */
-    protected User(UserInput input) {
+    protected User(final UserInput input) {
         this.username = input.getUsername();
         this.email = input.getEmail();
         this.role = Role.fromString(input.getRole());
     }
 
+    /**
+     * Adds notification String to the user's list
+     * @param notification
+     */
     @Override
-    public void update(String notification) {
+    public void update(final String notification) {
         this.notifications.add(notification);
-    }
-
-    public void clear(String notification) {
-        this.notifications.clear();
     }
 
 }

@@ -62,7 +62,7 @@ public final class MilestoneDatabase {
      * @param names
      * @return
      */
-    public List<Milestone> getMilestonesByNames(List<String> names) {
+    public List<Milestone> getMilestonesByNames(final List<String> names) {
         if (names == null || names.isEmpty()) {
             return new ArrayList<>();
         }

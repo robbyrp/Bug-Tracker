@@ -8,6 +8,14 @@ import user.User;
 import java.util.List;
 
 public interface AddCommentStrategy {
-    boolean validate(final Ticket ticket, final User user,
-                     final CommandInput commandInput, final List<ObjectNode> outputs);
+    /**
+     * Boolean abstract method that is to be implemented in the concrete strategies
+     * @param ticket
+     * @param user
+     * @param commandInput
+     * @param outputs
+     * @return
+     */
+    boolean validate(Ticket ticket, User user,
+                     CommandInput commandInput, List<ObjectNode> outputs);
 }

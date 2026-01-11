@@ -1,6 +1,10 @@
 package ticket;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -9,7 +13,6 @@ import enums.BusinessPriority;
 import enums.ExpertiseArea;
 import enums.Status;
 import enums.TicketType;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -84,7 +87,7 @@ public class Ticket {
      * Copy constructor
      * @param t
      */
-    public Ticket(Ticket t) {
+    public Ticket(final Ticket t) {
         this.id = t.id;
         this.type = t.type;
         this.title = t.title;
@@ -202,7 +205,12 @@ public class Ticket {
             return self();
         }
 
-        public T reportedTimestamp (final LocalDate reportedTimestamps) {
+        /**
+         *
+         * @param reportedTimestamps
+         * @return
+         */
+        public T reportedTimestamp(final LocalDate reportedTimestamps) {
             this.reportedTimestamp = reportedTimestamps;
             return self();
         }
@@ -211,7 +219,7 @@ public class Ticket {
          * builds the ticket's child object
          * @return
          */
-        public abstract Ticket build() ;
+        public abstract Ticket build();
 
     }
 
@@ -221,7 +229,9 @@ public class Ticket {
      * @param username
      * @param timestamp
      */
-    public void addHistoryAssign(final String action, final String username, final String timestamp) {
+    public void addHistoryAssign(final String action,
+                                 final String username,
+                                 final String timestamp) {
         history.add(new TicketAction(action, username, timestamp));
     }
 
@@ -254,9 +264,11 @@ public class Ticket {
      * Internal class that transforms a null object to ""
      * For json output
      */
-    public static class EmptyStringSerializer extends JsonSerializer<Object> {
+    public static final class EmptyStringSerializer extends JsonSerializer<Object> {
         @Override
-        public void serialize(Object value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        public void serialize(final Object value,
+                              final JsonGenerator gen,
+                              final SerializerProvider serializers) throws IOException {
             gen.writeString("");
         }
     }

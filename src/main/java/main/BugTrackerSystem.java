@@ -1,16 +1,28 @@
 package main;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import command.*;
-import command.ReportCommands.AppStabilityReportCommand;
-import command.ReportCommands.CustomerImpactReportCommand;
-import command.ReportCommands.GenerateTicketRiskReportCommand;
-import command.ReportCommands.ResolutionEfficiencyReportCommand;
-import command.ReportCommands.PerformanceReportCommand;
+import command.UndoAssignTicketCommand;
+import command.UndoChangeStatusCommand;
+import command.UndoAddCommentCommand;
+import command.ViewAssignedTicketsCommand;
+import command.ViewNotificationsCommand;
+import command.ChangeStatusCommand;
+import command.StartTestingPhaseCommand;
+import command.LostInvestorsCommand;
+import command.AssignTicketCommand;
+import command.Command;
+import command.CreateMilestoneCommand;
+import command.ReportTicketCommand;
+import command.reportCommands.AppStabilityReportCommand;
+import command.reportCommands.CustomerImpactReportCommand;
+import command.reportCommands.GenerateTicketRiskReportCommand;
+import command.reportCommands.ResolutionEfficiencyReportCommand;
+import command.reportCommands.PerformanceReportCommand;
 import command.addComment.AddCommentCommand;
 import command.search.SearchCommand;
 import command.viewMilestones.ViewMilestonesCommand;
 import command.viewTicketHistory.ViewTicketHistoryCommand;
 import command.viewTickets.ViewTicketsCommand;
+
 import enums.ApplicationPhase;
 import enums.Role;
 import exceptions.InvalidPhaseException;
@@ -73,7 +85,11 @@ public final class BugTrackerSystem {
 
             LocalDate currentDate = LocalDate.parse(commandInput.getTimestamp());
 
-            milestoneManager.updateAllMilestones(milestoneDatabase, ticketDatabase, userDatabase, currentDate);
+            milestoneManager.updateAllMilestones(milestoneDatabase,
+                    ticketDatabase,
+                    userDatabase,
+                    currentDate
+            );
 
             command.execute(this, outputs);
 
@@ -174,7 +190,8 @@ public final class BugTrackerSystem {
             case "lostInvestors" -> new LostInvestorsCommand(input, user);
             case "generateCustomerImpactReport" -> new CustomerImpactReportCommand(input, user);
             case "generateTicketRiskReport" -> new GenerateTicketRiskReportCommand(input, user);
-            case "generateResolutionEfficiencyReport" -> new ResolutionEfficiencyReportCommand(input, user);
+            case "generateResolutionEfficiencyReport" ->
+                    new ResolutionEfficiencyReportCommand(input, user);
             case "appStabilityReport" -> new AppStabilityReportCommand(input, user);
             case "generatePerformanceReport" -> new PerformanceReportCommand(input, user);
             case "search" -> new SearchCommand(input, user);

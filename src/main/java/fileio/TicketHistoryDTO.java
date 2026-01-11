@@ -6,7 +6,6 @@ import ticket.Comment;
 import ticket.Ticket;
 import ticket.TicketAction;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -17,7 +16,7 @@ public final class TicketHistoryDTO {
     private final List<TicketAction> actions;
     private final List<Comment> comments;
 
-    public TicketHistoryDTO(Ticket t) {
+    public TicketHistoryDTO(final Ticket t) {
         this.id = t.getId();
         this.title = t.getTitle();
         this.status = t.getStatus();

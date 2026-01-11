@@ -25,7 +25,7 @@ public final class UiRequest extends Ticket {
         this.usabilityScore = builder.usabilityScore;
     }
 
-    public final static class UiRequestBuilder extends Ticket.Builder<UiRequestBuilder> {
+    public static final class UiRequestBuilder extends Ticket.Builder<UiRequestBuilder> {
         private BusinessValue businessValue;
         private int usabilityScore;
 

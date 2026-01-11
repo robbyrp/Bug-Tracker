@@ -41,21 +41,25 @@ public final class ChangeStatusCommand extends Command {
         }
 
         String oldStatus = ticket.getStatus().name();
-        switch(ticket.getStatus()) {
+        switch (ticket.getStatus()) {
+
             case Status.OPEN -> ticket.setStatus(Status.IN_PROGRESS);
             case Status.IN_PROGRESS -> ticket.setStatus(Status.RESOLVED);
             case Status.RESOLVED, Status.CLOSED -> ticket.setStatus(Status.CLOSED);
+            default -> {
+                return;
+            }
         }
 
         String newStatus = ticket.getStatus().name();
 
         LocalDate currentDate = LocalDate.parse(getCommandInput().getTimestamp());
 
-        if (ticket.getStatus().equals(Status.RESOLVED) || ticket.getStatus().equals(Status.CLOSED)) {
-//            if (ticket.getSolvedAt() == null) {
-                ticket.setSolvedAt(currentDate);
-//            }
-        } else if (ticket.getStatus().equals(Status.IN_PROGRESS) || ticket.getStatus().equals(Status.OPEN)) {
+        if (ticket.getStatus().equals(Status.RESOLVED)
+                || ticket.getStatus().equals(Status.CLOSED)) {
+            ticket.setSolvedAt(currentDate);
+        } else if (ticket.getStatus().equals(Status.IN_PROGRESS)
+                || ticket.getStatus().equals(Status.OPEN)) {
             ticket.setSolvedAt(null);
         }
 

@@ -45,11 +45,15 @@ public final class UndoAssignTicketCommand extends  Command {
         ticket.setAssignedTo("");
         ticket.setAssignedAt(null);
 
-        ticket.addHistoryAssign("DE-ASSIGNED", getUser().getUsername(), getCommandInput().getTimestamp());
+        ticket.addHistoryAssign("DE-ASSIGNED",
+                getUser().getUsername(),
+                getCommandInput().getTimestamp()
+        );
 
     }
 
-    private boolean checkTicketStatus(final BugTrackerSystem system, final List<ObjectNode> outputs,
+    private boolean checkTicketStatus(final BugTrackerSystem system,
+                                      final List<ObjectNode> outputs,
                                       final Ticket ticket) {
         if (ticket.getStatus() != Status.IN_PROGRESS) {
             outputs.add(OutputFormatter.createError(

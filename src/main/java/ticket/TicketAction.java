@@ -57,7 +57,8 @@ public final class TicketAction {
      * @param by
      * @param timestamp
      */
-    public TicketAction(String action, String milestone, String by, String timestamp) {
+    public TicketAction(final String action, final String milestone,
+                        final String by, final String timestamp) {
         this.action = action;
         this.milestone = milestone;
         this.by = by;

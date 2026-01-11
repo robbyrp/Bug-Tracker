@@ -71,13 +71,16 @@ public final class AssignTicketCommand extends Command {
         LocalDate assignedAt = LocalDate.parse(getCommandInput().getTimestamp());
         ticket.setAssignedAt(assignedAt);
 
-        ticket.addHistoryAssign("ASSIGNED", getUser().getUsername(), getCommandInput().getTimestamp());
+        ticket.addHistoryAssign("ASSIGNED",
+                getUser().getUsername(),
+                getCommandInput().getTimestamp()
+        );
         ticket.addHistoryStatus("STATUS_CHANGED",
                 oldStatus.name(),
                 newStatus.name(),
                 getUser().getUsername(),
                 getCommandInput().getTimestamp()
-                );
+        );
     }
 
     private boolean checkExpertiseArea(final BugTrackerSystem system,

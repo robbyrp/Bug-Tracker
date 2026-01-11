@@ -18,7 +18,7 @@ public final class FeatureRequest extends Ticket {
         this.customerDemand = builder.customerDemand;
     }
 
-    public final static class FeatureRequestBuilder extends Ticket.Builder<FeatureRequestBuilder> {
+    public static final class FeatureRequestBuilder extends Ticket.Builder<FeatureRequestBuilder> {
         private BusinessValue businessValue;
         private CustomerDemand customerDemand;
 

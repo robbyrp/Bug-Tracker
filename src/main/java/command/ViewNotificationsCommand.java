@@ -11,7 +11,7 @@ import user.User;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewNotificationsCommand extends Command {
+public final class ViewNotificationsCommand extends Command {
 
     public ViewNotificationsCommand(final CommandInput input, final User user) {
         super(input, user);
@@ -27,6 +27,11 @@ public class ViewNotificationsCommand extends Command {
         return List.of(Role.DEVELOPER);
     }
 
+    /**
+     * Execute method that displays notifications by using a copy and deleting it
+     * @param system The engine of the program
+     * @param outputs output mapper
+     */
     @Override
     public void execute(final BugTrackerSystem system, final List<ObjectNode> outputs) {
         User user = getUser();

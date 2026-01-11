@@ -31,7 +31,7 @@ public final class Bug extends Ticket {
         this.severity = builder.severity;
     }
 
-    public final static class BugBuilder extends Ticket.Builder<BugBuilder> {
+    public static final class BugBuilder extends Ticket.Builder<BugBuilder> {
         private String expectedBehavior;
         private String actualBehavior;
         private Frequency frequency;

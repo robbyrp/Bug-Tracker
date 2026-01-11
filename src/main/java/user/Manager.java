@@ -11,7 +11,7 @@ public final class Manager extends User {
     private String hireDate;
     private ArrayList<String> subordinates;
 
-    public Manager(UserInput input) {
+    public Manager(final UserInput input) {
         super(input);
         this.hireDate = input.getHireDate();
         this.subordinates = input.getSubordinates();

@@ -7,6 +7,7 @@ import user.Reporter;
 import user.User;
 
 public final class UserFactory {
+    private UserFactory() { }
 
     public static User createUser(final UserInput input)
             throws IllegalArgumentException {

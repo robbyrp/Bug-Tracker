@@ -3,7 +3,6 @@ package command.viewTicketHistory;
 import main.BugTrackerSystem;
 import ticket.Ticket;
 import ticket.TicketAction;
-import ticket.TicketDatabase;
 import user.User;
 
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ public class ViewTicketHistoryDeveloper implements ViewTicketHistoryStrategy {
      * @return
      */
     @Override
-    public List<Ticket> getTickets(BugTrackerSystem system, User user) {
+    public List<Ticket> getTickets(final BugTrackerSystem system, final User user) {
         List<Ticket> visibleTickets = new ArrayList<>();
         String currentUser = user.getUsername();
 
@@ -35,7 +34,8 @@ public class ViewTicketHistoryDeveloper implements ViewTicketHistoryStrategy {
                 for (int i = 0; i < history.size(); i++) {
                     TicketAction action = history.get(i);
 
-                    if (action.getAction().equals("DE-ASSIGNED") && action.getBy().equals(currentUser)) {
+                    if (action.getAction().equals("DE-ASSIGNED")
+                            && action.getBy().equals(currentUser)) {
                         lastDeassignedIndex = i;
                     }
                 }

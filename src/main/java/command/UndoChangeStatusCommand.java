@@ -8,11 +8,9 @@ import fileio.CommandInput;
 import fileio.OutputFormatter;
 import main.BugTrackerSystem;
 import ticket.Ticket;
-import ticket.TicketAction;
 import user.User;
 
 import java.util.List;
-import java.util.ListIterator;
 
 public final class UndoChangeStatusCommand extends Command {
 
@@ -53,7 +51,8 @@ public final class UndoChangeStatusCommand extends Command {
         Status currentStatus = ticket.getStatus();
         Status prevStatus = null;
 
-        switch(currentStatus) {
+        switch (currentStatus) {
+
             case CLOSED -> prevStatus = Status.RESOLVED;
             case RESOLVED -> prevStatus = Status.IN_PROGRESS;
             default -> {

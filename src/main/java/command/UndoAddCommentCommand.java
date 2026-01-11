@@ -67,7 +67,7 @@ public final class UndoAddCommentCommand extends Command {
      * @return
      */
     private boolean checkBeforeDeleting(final BugTrackerSystem system,
-                                        List<ObjectNode> outputs) {
+                                        final List<ObjectNode> outputs) {
         Integer ticketId =  getCommandInput().getTicketID();
         Ticket ticket = system.getTicketDatabase().getTicketById(ticketId);
 

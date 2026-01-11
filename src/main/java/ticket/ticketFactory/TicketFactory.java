@@ -1,6 +1,13 @@
 package ticket.ticketFactory;
 
-import enums.*;
+import enums.BusinessValue;
+import enums.CustomerDemand;
+import enums.Frequency;
+import enums.TicketType;
+import enums.Status;
+import enums.BusinessPriority;
+import enums.ExpertiseArea;
+import enums.Severity;
 import fileio.TicketInput;
 import ticket.Bug;
 import ticket.FeatureRequest;
@@ -9,6 +16,14 @@ import ticket.UiRequest;
 
 
 public final class TicketFactory {
+    private TicketFactory() { }
+
+    /**
+     * Builds the ticket from a TicketInput
+     * @param input
+     * @return
+     * @throws IllegalArgumentException
+     */
     public static Ticket createTicket(final TicketInput input)
         throws IllegalArgumentException {
 
@@ -30,7 +45,8 @@ public final class TicketFactory {
             case "FEATURE_REQUEST":
                 FeatureRequest.FeatureRequestBuilder featureRequestBuilder =
                         new FeatureRequest.FeatureRequestBuilder();
-                featureRequestBuilder.businessValue(BusinessValue.fromString(input.getBusinessValue()))
+                featureRequestBuilder.
+                        businessValue(BusinessValue.fromString(input.getBusinessValue()))
                         .customerDemand(CustomerDemand.fromString(input.getCustomerDemand()));
                 builder = featureRequestBuilder;
                 break;
@@ -60,7 +76,8 @@ public final class TicketFactory {
      * @param builder Accepts any builder that extends Ticket.Builder
      * @param input
      */
-    private static void populateTicketFields(final Ticket.Builder<?> builder, final TicketInput input) {
+    private static void populateTicketFields(final Ticket.Builder<?> builder,
+                                             final TicketInput input) {
         builder.type(TicketType.fromString(input.getType()))
                 .title(input.getTitle())
                 .businessPriority(BusinessPriority.fromString(input.getBusinessPriority()))

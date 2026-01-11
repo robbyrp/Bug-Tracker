@@ -1,6 +1,5 @@
 package user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import fileio.UserInput;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +13,7 @@ public final class Developer extends User {
     private double performanceScore;
     private String hireDate;
 
-    public Developer(UserInput input) {
+    public Developer(final UserInput input) {
         super(input);
         this.hireDate = input.getHireDate();
         this.expertiseArea = ExpertiseArea.fromString(input.getExpertiseArea());

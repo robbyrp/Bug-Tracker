@@ -1,9 +1,6 @@
-package command.ReportCommands;
+package command.reportCommands;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import command.Command;
-import enums.ApplicationPhase;
-import enums.Role;
 import enums.Status;
 import fileio.CommandInput;
 import fileio.OutputFormatter;
@@ -20,13 +17,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class GenerateTicketRiskReportCommand extends AbstractReportCommand {
+public class CustomerImpactReportCommand extends AbstractReportCommand {
 
-    private static final double BUG_RISK = 12.0;
-    private static final double FEATURE_RISK = 20.0;
-    private static final double UI_RISK = 100.0;
+    private static final double BUG_IMPACT = 48.0;
+    private static final double FEATURE_IMPACT = 100.0;
+    private static final double UI_IMPACT = 100.0;
 
-    public GenerateTicketRiskReportCommand(CommandInput input, User user) {
+    public CustomerImpactReportCommand(final CommandInput input, final User user) {
         super(input, user);
     }
 
@@ -42,11 +39,12 @@ public final class GenerateTicketRiskReportCommand extends AbstractReportCommand
     public void execute(final BugTrackerSystem system, final List<ObjectNode> outputs) {
 
         Map<String, Integer> ticketsByType = getInitializedTypeMap();
+
         Map<String, Integer> ticketsByPriority = getInitializedPriorityMap();
 
-        List<Double> bugRisks = new ArrayList<>();
-        List<Double> featureRisks = new ArrayList<>();
-        List<Double> uiRisks = new ArrayList<>();
+        List<Double> bugScores = new ArrayList<>();
+        List<Double> featureScores = new ArrayList<>();
+        List<Double> uiScores = new ArrayList<>();
 
         int totalTickets = 0;
         List<Ticket> allTickets = system.getTicketDatabase().getTickets();
@@ -55,40 +53,43 @@ public final class GenerateTicketRiskReportCommand extends AbstractReportCommand
                     && !ticket.getStatus().equals(Status.IN_PROGRESS)) {
                 continue;
             }
-
             totalTickets++;
 
             updateCounters(ticket, ticketsByType, ticketsByPriority);
 
             switch (ticket.getType()) {
 
-                case BUG :
+                case BUG:
                     Bug bug = (Bug) ticket;
-                    bugRisks.add(calculateBugRisk(bug));
+                    bugScores.add(calculateBugImpact(bug));
                     break;
 
                 case FEATURE_REQUEST:
                     FeatureRequest fr = (FeatureRequest) ticket;
-                    featureRisks.add(calculateFeatureRisk(fr));
+                    featureScores.add(calculateFeatureImpact(fr));
                     break;
 
                 case UI_FEEDBACK:
                     UiRequest uiRequest = (UiRequest) ticket;
-                    uiRisks.add(calculateUiRisk(uiRequest));
+                    uiScores.add(calculateUiImpact(uiRequest));
                     break;
+
+                default:
+                    break;
+
             }
         }
 
-        Map<String, String> riskByType = new LinkedHashMap<>();
-        riskByType.put("BUG", getRiskLabel(calculateAverage(bugRisks)));
-        riskByType.put("FEATURE_REQUEST", getRiskLabel(calculateAverage(featureRisks)));
-        riskByType.put("UI_FEEDBACK", getRiskLabel(calculateAverage(uiRisks)));
+        Map<String, Double> customerImpactByType = new LinkedHashMap<>();
+        customerImpactByType.put("BUG", calculateAverage(bugScores));
+        customerImpactByType.put("FEATURE_REQUEST", calculateAverage(featureScores));
+        customerImpactByType.put("UI_FEEDBACK", calculateAverage(uiScores));
 
         Map<String, Object> reportObject = new LinkedHashMap<>();
         reportObject.put("totalTickets", totalTickets);
         reportObject.put("ticketsByType", ticketsByType);
         reportObject.put("ticketsByPriority", ticketsByPriority);
-        reportObject.put("riskByType", riskByType);
+        reportObject.put("customerImpactByType", customerImpactByType);
 
         outputs.add(OutputFormatter.createReportResponse(
                 getCommandInput().getCommand(),
@@ -97,21 +98,20 @@ public final class GenerateTicketRiskReportCommand extends AbstractReportCommand
                 "report",
                 reportObject
         ));
-
     }
-
 
     /**
      * Applies formula to calculate specific parameter
      * @param bug
      * @return
      */
-    private double calculateBugRisk(final Bug bug) {
+    private double calculateBugImpact(final Bug bug) {
         int frequency = ReportScoreDatabase.getFrequencyScore(bug.getFrequency());
+        int priority = ReportScoreDatabase.getPriorityScore(bug.getBusinessPriority());
         int severity = ReportScoreDatabase.getSeverityScore(bug.getSeverity());
 
-        double rawScore = (double) frequency * severity;
-        return normalize(rawScore, BUG_RISK);
+        double rawScore = (double) frequency * priority * severity;
+        return normalize(rawScore, BUG_IMPACT);
     }
 
     /**
@@ -119,12 +119,12 @@ public final class GenerateTicketRiskReportCommand extends AbstractReportCommand
      * @param fr
      * @return
      */
-    private double calculateFeatureRisk(final FeatureRequest fr) {
-        int value = ReportScoreDatabase.getBusinessValueScore(fr.getBusinessValue());
+    private double calculateFeatureImpact(final FeatureRequest fr) {
+        int val = ReportScoreDatabase.getBusinessValueScore(fr.getBusinessValue());
         int demand = ReportScoreDatabase.getCustomerDemandScore(fr.getCustomerDemand());
 
-        double rawScore = (double) value + demand;
-        return normalize(rawScore, FEATURE_RISK);
+        double rawScore = (double) val * demand;
+        return normalize(rawScore, FEATURE_IMPACT);
     }
 
     /**
@@ -132,29 +132,12 @@ public final class GenerateTicketRiskReportCommand extends AbstractReportCommand
      * @param uiRequest
      * @return
      */
-    private double calculateUiRisk(final UiRequest uiRequest) {
-        int value = ReportScoreDatabase.getBusinessValueScore(uiRequest.getBusinessValue());
+    private double calculateUiImpact(final UiRequest uiRequest) {
+        int val = ReportScoreDatabase.getBusinessValueScore(uiRequest.getBusinessValue());
         int usability = uiRequest.getUsabilityScore();
 
-        double rawScore = (11.0 - usability) * value;
-        return normalize(rawScore, UI_RISK);
-    }
-
-    /**
-     * Risk score lookup table
-     * @param score
-     * @return
-     */
-    private String getRiskLabel(final double score) {
-        if (score < 25.0) {
-            return "NEGLIGIBLE";
-        } else if (score < 50.0) {
-            return "MODERATE";
-        } else if (score < 75.0) {
-            return "SIGNIFICANT";
-        } else {
-            return "MAJOR";
-        }
+        double rawScore = (double) val * usability;
+        return normalize(rawScore, UI_IMPACT);
     }
 
 }
