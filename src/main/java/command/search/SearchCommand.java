@@ -11,7 +11,7 @@ import user.User;
 
 import java.util.List;
 
-public class SearchCommand extends Command {
+public final class SearchCommand extends Command {
     private SearchStrategy strategy;
 
     public SearchCommand(final CommandInput input, final User user) {

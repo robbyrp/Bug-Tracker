@@ -1,4 +1,4 @@
-package command.ReportCommands;
+package command.reportCommands;
 
 import command.Command;
 import fileio.CommandInput;
@@ -20,12 +20,12 @@ public abstract class AbstractReportCommand extends Command {
     }
 
     @Override
-    public ApplicationPhase getRequiredPhase() {
+    public final ApplicationPhase getRequiredPhase() {
         return ApplicationPhase.DEVELOPMENT;
     }
 
     @Override
-    public List<Role> getRequiredRoles() {
+    public final List<Role> getRequiredRoles() {
         return List.of(Role.MANAGER);
     }
 

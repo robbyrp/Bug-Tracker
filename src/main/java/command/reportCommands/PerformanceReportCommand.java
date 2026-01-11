@@ -1,8 +1,13 @@
-package command.ReportCommands;
+package command.reportCommands;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import command.Command;
-import enums.*;
+import enums.ApplicationPhase;
+import enums.Role;
+import enums.Status;
+import enums.TicketType;
+import enums.BusinessPriority;
+import enums.Seniority;
 import fileio.CommandInput;
 import fileio.OutputFormatter;
 import main.BugTrackerSystem;
@@ -14,9 +19,28 @@ import user.User;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
-public class PerformanceReportCommand extends Command {
+public final class PerformanceReportCommand extends Command {
+    private static final double ROUND_VALUE = 100.0;
+    private static final double CLOSED_PARAM = 0.5;
+    private static final double PRIO_MID_PARAM = 0.5;
+    private static final double HIGH_PRIO_MID_PARAM = 0.7;
+    private static final double AVG_MID = 0.3;
+    private static final double HIGH_PRIO_SENIOR_PARAM = 1.0;
+    private static final double AVG_TIME_PARAM = 0.5;
+    private static final double AVERAGE_FACTOR = 3.0;
+    private static final double STD_DEV_FACTOR = 2.0;
+
+
+    private static final double JUNIOR_BONUS = 5.0;
+    private static final double MID_BONUS = 15.0;
+    private static final double SENIOR_BONUS = 30.0;
+
     public PerformanceReportCommand(final CommandInput input, final User user) {
         super(input, user);
     }
@@ -34,7 +58,7 @@ public class PerformanceReportCommand extends Command {
     /**
      * Execute method that calculates the performance report metrics.
      * It checks ticket history for last status change between
-     * IN_PROGRESS and RESOLVED 
+     * * IN_PROGRESS and RESOLVED
      * @param system The engine of the program
      * @param outputs output mapper
      */
@@ -122,6 +146,10 @@ public class PerformanceReportCommand extends Command {
 
                     case Seniority.SENIOR -> performanceScore = calculateSeniorScore(
                             closedTickets, highPriorityCount, avgResolutionTime);
+
+                    default -> {
+                        return;
+                    }
                 }
             }
 
@@ -146,36 +174,84 @@ public class PerformanceReportCommand extends Command {
     }
 
 
-    private double calculateJuniorScore(int closedTickets, int bugs, int features, int uis) {
+    /**
+     * Calculates junior score
+     * @param closedTickets
+     * @param bugs
+     * @param features
+     * @param uis
+     * @return
+     */
+    private double calculateJuniorScore(final int closedTickets, final int bugs,
+                                        final int features, final int uis) {
         double diversity = ticketDiversityFactor(bugs, features, uis);
-        double base = (0.5 * closedTickets) - diversity;
-        return Math.max(0.0, base) + 5.0;
+        double base = (CLOSED_PARAM * closedTickets) - diversity;
+        return Math.max(0.0, base) + JUNIOR_BONUS;
     }
 
-    private double calculateMidScore(int closedTickets, int highPrio, double avgTime) {
-        double base = (0.5 * closedTickets) + (0.7 * highPrio) - (0.3 * avgTime);
-        return Math.max(0.0, base) + 15.0;
+    /**
+     * Calculates mid score
+     * @param closedTickets
+     * @param highPrio
+     * @param avgTime
+     * @return
+     */
+    private double calculateMidScore(final int closedTickets,
+                                     final int highPrio, final double avgTime) {
+        double base = (CLOSED_PARAM * closedTickets) + (HIGH_PRIO_MID_PARAM * highPrio)
+                - (AVG_MID * avgTime);
+        return Math.max(0.0, base) + MID_BONUS;
     }
 
-    private double calculateSeniorScore(int closedTickets, int highPrio, double avgTime) {
-        double base = (0.5 * closedTickets) + (1.0 * highPrio) - (0.5 * avgTime);
-        return Math.max(0.0, base) + 30.0;
+    /**
+     * Calculates senior score
+     * @param closedTickets
+     * @param highPrio
+     * @param avgTime
+     * @return
+     */
+    private double calculateSeniorScore(final int closedTickets, final int highPrio,
+                                        final double avgTime) {
+        double base = (CLOSED_PARAM * closedTickets)
+                + (HIGH_PRIO_SENIOR_PARAM * highPrio) - (AVG_TIME_PARAM * avgTime);
+        return Math.max(0.0, base) + SENIOR_BONUS;
     }
 
 
-    private double averageResolvedTicketType(int bug, int feature, int ui) {
-        return (bug + feature + ui) / 3.0;
+    /**
+     * Calculates average
+     * @param bug
+     * @param feature
+     * @param ui
+     * @return
+     */
+    private double averageResolvedTicketType(final int bug, final int feature, final int ui) {
+        return (bug + feature + ui) / AVERAGE_FACTOR;
     }
 
-    private double standardDeviation(int bug, int feature, int ui) {
+    /**
+     * Standard deviation
+     * @param bug
+     * @param feature
+     * @param ui
+     * @return
+     */
+    private double standardDeviation(final int bug, final int feature, final int ui) {
         double mean = averageResolvedTicketType(bug, feature, ui);
-        double variance = (Math.pow(bug - mean, 2)
-                + Math.pow(feature - mean, 2)
-                + Math.pow(ui - mean, 2)) / 3.0;
+        double variance = (Math.pow(bug - mean, STD_DEV_FACTOR)
+                + Math.pow(feature - mean, STD_DEV_FACTOR)
+                + Math.pow(ui - mean, STD_DEV_FACTOR)) / AVERAGE_FACTOR;
         return Math.sqrt(variance);
     }
 
-    private double ticketDiversityFactor(int bug, int feature, int ui) {
+    /**
+     * Calculate ticket diversity factor
+     * @param bug
+     * @param feature
+     * @param ui
+     * @return
+     */
+    private double ticketDiversityFactor(final int bug, final int feature, final int ui) {
         double mean = averageResolvedTicketType(bug, feature, ui);
         if (mean == 0.0) {
             return 0.0;
@@ -185,7 +261,13 @@ public class PerformanceReportCommand extends Command {
     }
 
 
-    private long calculateDaysToResolve(Ticket t, LocalDate end) {
+    /**
+     * Calculates days to resolve
+     * @param t
+     * @param end
+     * @return
+     */
+    private long calculateDaysToResolve(final Ticket t, final LocalDate end) {
         if (t.getAssignedAt() == null || end == null) {
             return 0;
         }
@@ -200,7 +282,7 @@ public class PerformanceReportCommand extends Command {
      * @param ticket
      * @return
      */
-    private LocalDate getTicketLastResolvedDate(Ticket ticket) {
+    private LocalDate getTicketLastResolvedDate(final Ticket ticket) {
         if (ticket.getHistory() == null || ticket.getHistory().isEmpty()) {
             return ticket.getSolvedAt();
         }
@@ -209,7 +291,7 @@ public class PerformanceReportCommand extends Command {
 
         for (int i = history.size() - 1; i >= 0; i--) {
             TicketAction action = history.get(i);
-            if (action.getAction().equals("STATUS_CHANGED")){
+            if (action.getAction().equals("STATUS_CHANGED")) {
                  if (action.getTo().equals("RESOLVED") && action.getFrom().equals("IN_PROGRESS")) {
                     return LocalDate.parse(action.getTimestamp());
                  }
@@ -218,12 +300,12 @@ public class PerformanceReportCommand extends Command {
         return ticket.getSolvedAt();
     }
 
-
-
-
-
-
-    private double round(double value) {
-        return Math.round(value * 100.0) / 100.0;
+    /**
+     * Rounding method
+     * @param value
+     * @return
+     */
+    private double round(final double value) {
+        return Math.round(value * ROUND_VALUE) / ROUND_VALUE;
     }
 }

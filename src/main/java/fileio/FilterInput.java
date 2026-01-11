@@ -16,8 +16,8 @@ public final class FilterInput {
     private String createdAfter;
     private boolean availableForAssignment;
 
-    // Manager filters: all of the above +
-    private ArrayList<String> keywords; // este case-insensitive și caută potrivirea parțială sau completă a cel puțin un cuvânt în description sau title.
+    // Manager filters: all of the above and
+    private ArrayList<String> keywords;
     private String expertiseArea;
     private String seniority;
     private Integer performanceScoreAbove;

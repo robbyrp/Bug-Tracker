@@ -31,7 +31,7 @@ public final class SearchedTicketDTO {
     private final LocalDate solvedAt;
     private final String reportedBy;
 
-    public SearchedTicketDTO(Ticket t) {
+    public SearchedTicketDTO(final Ticket t) {
         this.id = t.getId();
         this.type = t.getType();
         this.title = t.getTitle();

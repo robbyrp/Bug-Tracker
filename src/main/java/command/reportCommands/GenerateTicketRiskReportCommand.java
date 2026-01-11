@@ -1,4 +1,4 @@
-package command.ReportCommands;
+package command.reportCommands;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import enums.Status;
@@ -12,20 +12,24 @@ import ticket.UiRequest;
 import user.User;
 import utils.ReportScoreDatabase;
 
-import java.lang.classfile.attribute.DeprecatedAttribute;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ResolutionEfficiencyReportCommand extends AbstractReportCommand {
+public final class GenerateTicketRiskReportCommand extends AbstractReportCommand {
 
-    private static final double BUG_EFFICIENCY = 70.0;
-    private static final double FEATURE_EFFICIENCY = 20.0;
-    private static final double UI_EFFICIENCY = 20.0;
+    private static final double BUG_RISK = 12.0;
+    private static final double FEATURE_RISK = 20.0;
+    private static final double UI_RISK = 100.0;
 
-    public ResolutionEfficiencyReportCommand(CommandInput input, User user) {
+    private static final int NEGLIGIBLE_CAP = 25;
+    private static final int MODERATE_CAP = 50;
+    private static final int SIGNIFICANT_CAP = 75;
+
+    private static final double USABILITY_PARAM = 11.0;
+
+    public GenerateTicketRiskReportCommand(final CommandInput input, final User user) {
         super(input, user);
     }
 
@@ -39,54 +43,58 @@ public class ResolutionEfficiencyReportCommand extends AbstractReportCommand {
      */
     @Override
     public void execute(final BugTrackerSystem system, final List<ObjectNode> outputs) {
+
         Map<String, Integer> ticketsByType = getInitializedTypeMap();
         Map<String, Integer> ticketsByPriority = getInitializedPriorityMap();
 
-        List<Double> bugScores = new ArrayList<>();
-        List<Double> featureScores = new ArrayList<>();
-        List<Double> uiScores = new ArrayList<>();
+        List<Double> bugRisks = new ArrayList<>();
+        List<Double> featureRisks = new ArrayList<>();
+        List<Double> uiRisks = new ArrayList<>();
 
         int totalTickets = 0;
         List<Ticket> allTickets = system.getTicketDatabase().getTickets();
-
         for (Ticket ticket : allTickets) {
-            if (!ticket.getStatus().equals(Status.RESOLVED)
-                    && !ticket.getStatus().equals(Status.CLOSED)) {
+            if (!ticket.getStatus().equals(Status.OPEN)
+                    && !ticket.getStatus().equals(Status.IN_PROGRESS)) {
                 continue;
             }
 
             totalTickets++;
+
             updateCounters(ticket, ticketsByType, ticketsByPriority);
 
-            int daysToResolve = calculateDaysToResolve(ticket);
-
             switch (ticket.getType()) {
+
                 case BUG :
                     Bug bug = (Bug) ticket;
-                    bugScores.add(calculateBugEfficiency(bug, daysToResolve));
+                    bugRisks.add(calculateBugRisk(bug));
                     break;
 
                 case FEATURE_REQUEST:
                     FeatureRequest fr = (FeatureRequest) ticket;
-                    featureScores.add(calculateFeatureEfficiency(fr, daysToResolve));
+                    featureRisks.add(calculateFeatureRisk(fr));
                     break;
 
                 case UI_FEEDBACK:
-                    UiRequest ui = (UiRequest) ticket;
-                    uiScores.add(calculateUiEfficiency(ui, daysToResolve));
+                    UiRequest uiRequest = (UiRequest) ticket;
+                    uiRisks.add(calculateUiRisk(uiRequest));
+                    break;
+
+                default:
                     break;
             }
         }
-        Map<String, Double> efficiencyByType = new LinkedHashMap<>();
-        efficiencyByType.put("BUG", calculateAverage(bugScores));
-        efficiencyByType.put("FEATURE_REQUEST", calculateAverage(featureScores));
-        efficiencyByType.put("UI_FEEDBACK", calculateAverage(uiScores));
+
+        Map<String, String> riskByType = new LinkedHashMap<>();
+        riskByType.put("BUG", getRiskLabel(calculateAverage(bugRisks)));
+        riskByType.put("FEATURE_REQUEST", getRiskLabel(calculateAverage(featureRisks)));
+        riskByType.put("UI_FEEDBACK", getRiskLabel(calculateAverage(uiRisks)));
 
         Map<String, Object> reportObject = new LinkedHashMap<>();
         reportObject.put("totalTickets", totalTickets);
         reportObject.put("ticketsByType", ticketsByType);
         reportObject.put("ticketsByPriority", ticketsByPriority);
-        reportObject.put("efficiencyByType", efficiencyByType);
+        reportObject.put("riskByType", riskByType);
 
         outputs.add(OutputFormatter.createReportResponse(
                 getCommandInput().getCommand(),
@@ -95,63 +103,64 @@ public class ResolutionEfficiencyReportCommand extends AbstractReportCommand {
                 "report",
                 reportObject
         ));
+
     }
+
 
     /**
      * Applies formula to calculate specific parameter
      * @param bug
-     * @param days
      * @return
      */
-    private double calculateBugEfficiency(final Bug bug, final int days) {
+    private double calculateBugRisk(final Bug bug) {
         int frequency = ReportScoreDatabase.getFrequencyScore(bug.getFrequency());
         int severity = ReportScoreDatabase.getSeverityScore(bug.getSeverity());
 
-        double rawScore = (double) (frequency + severity) * 10 / days;
-        return normalize(rawScore, BUG_EFFICIENCY);
+        double rawScore = (double) frequency * severity;
+        return normalize(rawScore, BUG_RISK);
     }
 
     /**
      * Applies formula to calculate specific parameter
      * @param fr
-     * @param days
      * @return
      */
-    private double calculateFeatureEfficiency(final FeatureRequest fr, final int days) {
+    private double calculateFeatureRisk(final FeatureRequest fr) {
         int value = ReportScoreDatabase.getBusinessValueScore(fr.getBusinessValue());
         int demand = ReportScoreDatabase.getCustomerDemandScore(fr.getCustomerDemand());
 
-        double rawScore = (double) (value + demand) / days;
-        return normalize(rawScore, FEATURE_EFFICIENCY);
+        double rawScore = (double) value + demand;
+        return normalize(rawScore, FEATURE_RISK);
     }
 
     /**
      * Applies formula to calculate specific parameter
-     * @param ui
-     * @param days
+     * @param uiRequest
      * @return
      */
-    private double calculateUiEfficiency(final UiRequest ui, final int days) {
-        int value = ReportScoreDatabase.getBusinessValueScore(ui.getBusinessValue());
-        int usability = ui.getUsabilityScore();
+    private double calculateUiRisk(final UiRequest uiRequest) {
+        int value = ReportScoreDatabase.getBusinessValueScore(uiRequest.getBusinessValue());
+        int usability = uiRequest.getUsabilityScore();
 
-        double rawScore = (double) (usability + value) / days;
-        return normalize(rawScore, UI_EFFICIENCY);
+        double rawScore = (USABILITY_PARAM - usability) * value;
+        return normalize(rawScore, UI_RISK);
     }
 
     /**
-     * Calculates daysToResolve according to formula
-     * @param ticket
+     * Risk score lookup table
+     * @param score
      * @return
      */
-    private int calculateDaysToResolve(final Ticket ticket) {
-        if (ticket.getAssignedAt() == null || ticket.getSolvedAt() == null) {
-            return 1;
+    private String getRiskLabel(final double score) {
+        if (score < NEGLIGIBLE_CAP) {
+            return "NEGLIGIBLE";
+        } else if (score < MODERATE_CAP) {
+            return "MODERATE";
+        } else if (score < SIGNIFICANT_CAP) {
+            return "SIGNIFICANT";
+        } else {
+            return "MAJOR";
         }
-
-        int days = (int) ChronoUnit.DAYS.between(ticket.getAssignedAt(), ticket.getSolvedAt());
-
-        return 1 + days;
     }
 
 }

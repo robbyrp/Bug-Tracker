@@ -14,8 +14,10 @@ import user.User;
 import java.time.LocalDate;
 import java.util.List;
 
-public class AddCommentCommand extends Command {
+public final class AddCommentCommand extends Command {
     private AddCommentStrategy strategy;
+
+    private static final int MIN_LEN = 10;
 
     public AddCommentCommand(final CommandInput input, final User user) {
         super(input, user);
@@ -112,7 +114,7 @@ public class AddCommentCommand extends Command {
      */
     private boolean checkMinLength(final BugTrackerSystem system, final List<ObjectNode> outputs) {
         String comment = getCommandInput().getComment();
-        if (comment.length() <= 10) {
+        if (comment.length() <= MIN_LEN) {
             String error = "Comment must be at least 10 characters long.";
             outputs.add(OutputFormatter.createError(
                     getCommandInput().getCommand(),

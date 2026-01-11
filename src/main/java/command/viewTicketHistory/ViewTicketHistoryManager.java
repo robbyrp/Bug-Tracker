@@ -8,9 +8,9 @@ import user.User;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewTicketHistoryManager implements ViewTicketHistoryStrategy {
+public final class ViewTicketHistoryManager implements ViewTicketHistoryStrategy {
     @Override
-    public List<Ticket> getTickets(BugTrackerSystem system, User user) {
+    public List<Ticket> getTickets(final BugTrackerSystem system, final User user) {
         List<Milestone> createdByManager = new ArrayList<>();
         for (Milestone milestone : system.getMilestoneDatabase().getMilestoneList()) {
             if (milestone.getCreatedBy().equals(user.getUsername())) {

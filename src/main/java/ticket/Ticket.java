@@ -1,6 +1,10 @@
 package ticket;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -9,7 +13,6 @@ import enums.BusinessPriority;
 import enums.ExpertiseArea;
 import enums.Status;
 import enums.TicketType;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -202,6 +205,11 @@ public class Ticket {
             return self();
         }
 
+        /**
+         *
+         * @param reportedTimestamps
+         * @return
+         */
         public T reportedTimestamp (final LocalDate reportedTimestamps) {
             this.reportedTimestamp = reportedTimestamps;
             return self();

@@ -10,10 +10,9 @@ import main.BugTrackerSystem;
 import milestone.Milestone;
 import user.User;
 
-import java.time.LocalDate;
 import java.util.List;
 
-public class StartTestingPhaseCommand extends Command {
+public final class StartTestingPhaseCommand extends Command {
     public StartTestingPhaseCommand(final CommandInput input, final User user) {
         super(input, user);
     }

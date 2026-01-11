@@ -3,23 +3,14 @@ package milestone;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import enums.BusinessPriority;
 import enums.MilestoneStatus;
-import enums.Status;
 import fileio.CommandInput;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import ticket.Ticket;
-import ticket.TicketDatabase;
-import user.User;
-import user.UserDatabase;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Objects;
 
 @JsonPropertyOrder({
         "name", "blockingFor", "dueDate", "createdAt", "tickets", "assignedDevs",
@@ -28,7 +19,6 @@ import java.util.Objects;
 })
 @Getter @Setter
 public final class Milestone {
-    // Input fields
     private String name;
     private LocalDate dueDate;
     private ArrayList<String> blockingFor;
@@ -36,7 +26,6 @@ public final class Milestone {
     private ArrayList<String> assignedDevs;
     private String createdBy;
 
-    // Output fields
     private LocalDate createdAt;
     private MilestoneStatus status;
     @Getter(AccessLevel.NONE)
@@ -54,7 +43,7 @@ public final class Milestone {
     @JsonIgnore
     private static final double MAX_PERCENTAGE = 100.0;
     @JsonIgnore
-    private static final int DAYS_BETWEEN_UPDATES= 3;
+    private static final int DAYS_BETWEEN_UPDATES = 3;
 
     @JsonProperty("isBlocked")
     public boolean isBlocked() {

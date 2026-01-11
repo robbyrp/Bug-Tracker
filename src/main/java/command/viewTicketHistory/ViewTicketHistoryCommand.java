@@ -2,7 +2,6 @@ package command.viewTicketHistory;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import command.Command;
-import command.viewTickets.ViewTicketsStrategy;
 import enums.ApplicationPhase;
 import enums.Role;
 import fileio.CommandInput;
@@ -16,9 +15,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class ViewTicketHistoryCommand extends Command {
-
-    ViewTicketHistoryStrategy strategy;
+public final class ViewTicketHistoryCommand extends Command {
 
     public ViewTicketHistoryCommand(final CommandInput input, final User user) {
         super(input, user);
@@ -34,9 +31,16 @@ public class ViewTicketHistoryCommand extends Command {
     }
 
 
+    /**
+     * Execute command that outputs the ticket history
+     * The strategy gets the tickets for the specific role
+     * @param system The engine of the program
+     * @param outputs output mapper
+     */
     @Override
     public void execute(final BugTrackerSystem system, final List<ObjectNode> outputs) {
-        switch(getUser().getRole()) {
+        ViewTicketHistoryStrategy strategy;
+        switch (getUser().getRole()) {
 
             case Role.DEVELOPER -> strategy = new ViewTicketHistoryDeveloper();
             case Role.MANAGER -> strategy = new ViewTicketHistoryManager();
@@ -49,7 +53,7 @@ public class ViewTicketHistoryCommand extends Command {
 
         tickets.sort(new Comparator<Ticket>() {
             @Override
-            public int compare(Ticket o1, Ticket o2) {
+            public int compare(final  Ticket o1, final Ticket o2) {
                 int compareByDate = o1.getReportedTimestamp().compareTo(o2.getReportedTimestamp());
                 if (compareByDate != 0) {
                     return compareByDate;

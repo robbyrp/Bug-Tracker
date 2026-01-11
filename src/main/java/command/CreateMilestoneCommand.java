@@ -50,7 +50,7 @@ public final class CreateMilestoneCommand extends Command {
         for (Integer ticketId : newMilestone.getTickets()) {
             Ticket ticket = system.getTicketDatabase().getTicketById(ticketId);
             if (ticket == null) {
-                throw new IllegalArgumentException("Ticket id " + ticketId + " is invalid.") ;
+                throw new IllegalArgumentException("Ticket id " + ticketId + " is invalid.");
             }
             ticket.addHistoryMilestone("ADDED_TO_MILESTONE",
                     newMilestone.getName(),

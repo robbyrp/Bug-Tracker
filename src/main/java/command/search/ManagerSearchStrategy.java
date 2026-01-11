@@ -1,7 +1,12 @@
 package command.search;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import enums.*;
+import enums.BusinessPriority;
+import enums.Role;
+import enums.Seniority;
+import enums.Status;
+import enums.TicketType;
+import enums.ExpertiseArea;
 import fileio.CommandInput;
 import fileio.FilterInput;
 import fileio.OutputFormatter;
@@ -12,14 +17,17 @@ import ticket.Ticket;
 import user.Developer;
 import user.Manager;
 import user.User;
-import user.UserDatabase;
 
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Collections;
 import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
-public class ManagerSearchStrategy implements SearchStrategy {
+public final class ManagerSearchStrategy implements SearchStrategy {
 
     @Override
     public void executeSearch(final BugTrackerSystem system, final List<ObjectNode> outputs,
@@ -37,20 +45,14 @@ public class ManagerSearchStrategy implements SearchStrategy {
         }
     }
 
-    private void searchDevelopers(final BugTrackerSystem system, final List<ObjectNode> outputs,
-                                  final Manager manager, CommandInput input) {
+    private void searchDevelopers(final BugTrackerSystem system,
+                                  final List<ObjectNode> outputs,
+                                  final Manager manager,
+                                  final CommandInput input) {
         FilterInput filters = input.getFilters();
         Map<String, User> users = system.getUserDatabase().getUsers();
 
         ArrayList<Developer> developers = new ArrayList<>();
-
-//        for (Map.Entry<String, User> userEntry : users.entrySet()) {
-//            User user = userEntry.getValue();
-//            String username = userEntry.getKey();
-//            if (user.getRole().equals(Role.DEVELOPER) && manager.getSubordinates().contains(username)) {
-//                developers.add((Developer) user);
-//            }
-//        }
 
         if (manager.getSubordinates() != null) {
             for (String username : manager.getSubordinates()) {
@@ -87,22 +89,27 @@ public class ManagerSearchStrategy implements SearchStrategy {
      * @param filters
      * @return
      */
-    private static Stream<Developer> getDeveloperStream( ArrayList<Developer> developers, final FilterInput filters) {
+    private static Stream<Developer> getDeveloperStream(final ArrayList<Developer> developers,
+                                                         final FilterInput filters) {
         Stream<Developer> devStream = developers.stream();
         if (filters.getExpertiseArea() != null) {
-            devStream = devStream.filter(dev -> dev.getExpertiseArea().name().equals(filters.getExpertiseArea()));
+            devStream = devStream.filter(dev ->
+                    dev.getExpertiseArea().name().equals(filters.getExpertiseArea()));
         }
 
         if (filters.getSeniority() != null) {
-            devStream = devStream.filter(dev -> dev.getSeniority().name().equals(filters.getSeniority()));
+            devStream = devStream.filter(dev ->
+                    dev.getSeniority().name().equals(filters.getSeniority()));
         }
 
         if (filters.getPerformanceScoreAbove() != null) {
-            devStream = devStream.filter(dev -> dev.getPerformanceScore() >= filters.getPerformanceScoreAbove());
+            devStream = devStream.filter(dev ->
+                    dev.getPerformanceScore() >= filters.getPerformanceScoreAbove());
         }
 
         if (filters.getPerformanceScoreBelow() != null) {
-            devStream = devStream.filter(dev -> dev.getPerformanceScore() <= filters.getPerformanceScoreBelow());
+            devStream = devStream.filter(dev ->
+                    dev.getPerformanceScore() <= filters.getPerformanceScoreBelow());
         }
         return devStream;
     }
@@ -127,40 +134,44 @@ public class ManagerSearchStrategy implements SearchStrategy {
         }
 
         if (filter.getType() != null) {
-            ticketStream = ticketStream.filter(ticket -> ticket.getType().name().equals(filter.getType()));
+            ticketStream = ticketStream.filter(ticket ->
+                    ticket.getType().name().equals(filter.getType()));
         }
 
         if (filter.getCreatedAt() != null) {
             LocalDate filterCreatedAt = LocalDate.parse(filter.getCreatedAt());
-            ticketStream = ticketStream.filter(ticket -> ticket.getReportedTimestamp().equals(filterCreatedAt));
+            ticketStream = ticketStream.filter(ticket ->
+                    ticket.getReportedTimestamp().equals(filterCreatedAt));
         }
 
         if (filter.getCreatedBefore() != null) {
             LocalDate filterCreatedBefore = LocalDate.parse(filter.getCreatedBefore());
-            ticketStream = ticketStream.filter(ticket -> ticket.getReportedTimestamp().isBefore(filterCreatedBefore));
+            ticketStream = ticketStream.filter(ticket ->
+                    ticket.getReportedTimestamp().isBefore(filterCreatedBefore));
         }
 
         if (filter.getCreatedAfter() != null) {
             LocalDate filterCreatedAfter = LocalDate.parse(filter.getCreatedAfter());
-            ticketStream = ticketStream.filter(ticket -> ticket.getReportedTimestamp().isAfter(filterCreatedAfter));
+            ticketStream = ticketStream.filter(ticket ->
+                    ticket.getReportedTimestamp().isAfter(filterCreatedAfter));
         }
 
         if (filter.isAvailableForAssignment()) {
-            ticketStream = ticketStream.filter(ticket -> isTicketAvailForAssignment(system, ticket, user));
+            ticketStream = ticketStream.filter(ticket ->
+                    isTicketAvailForAssignment(system, ticket, user));
         }
 
-        // KEYWORDS
         boolean searchesKeywords =  filter.getKeywords() != null && !filter.getKeywords().isEmpty();
         if (searchesKeywords) {
-            ticketStream = ticketStream.filter(ticket -> containsKeywords(ticket, filter.getKeywords()));
+            ticketStream = ticketStream.filter(ticket ->
+                    containsKeywords(ticket, filter.getKeywords()));
         }
 
-        // SORT
         List<Ticket> sortedTickets = ticketStream
-                .sorted(Comparator.comparing(Ticket::getReportedTimestamp).thenComparing(Ticket::getId))
+                .sorted(Comparator.comparing(Ticket::getReportedTimestamp).
+                        thenComparing(Ticket::getId))
                 .toList();
 
-        // OBJECT
         List<ObjectNode> jsonOutput = new ArrayList<>();
 
         for (Ticket ticket : sortedTickets) {
@@ -173,8 +184,6 @@ public class ManagerSearchStrategy implements SearchStrategy {
             node.set("matchingWords", OutputFormatter.mapToNode(matches));
             jsonOutput.add(node);
         }
-
-
 
         outputs.add(OutputFormatter.createSearchResponse(
                 input.getCommand(),
@@ -195,10 +204,10 @@ public class ManagerSearchStrategy implements SearchStrategy {
      * @param user
      * @return
      */
-    private boolean isTicketAvailForAssignment(final BugTrackerSystem system, final Ticket ticket, final User user) {
+    private boolean isTicketAvailForAssignment(final BugTrackerSystem system,
+                                               final Ticket ticket, final User user) {
         Developer developer = (Developer) user;
 
-        // Seniority check
         Seniority seniority = developer.getSeniority();
         BusinessPriority businessPriority = ticket.getBusinessPriority();
         TicketType ticketType = ticket.getType();
@@ -210,27 +219,26 @@ public class ManagerSearchStrategy implements SearchStrategy {
             return false;
         }
 
-        // Expertise check
         ExpertiseArea devExpertise = developer.getExpertiseArea();
         String ticketZone = ticket.getExpertiseArea().name();
         if (!devExpertise.hasAccessToZone(ticketZone)) {
             return false;
         }
 
-        // Ticket status check
         if (ticket.getStatus() != Status.OPEN) {
             return false;
         }
 
-        // Milestone did not assign developer
-        Milestone ownerMilestone = system.getMilestoneDatabase().getMilestoneByTicketId(ticket.getId());
-        if (ownerMilestone == null || ownerMilestone.getAssignedDevs() == null ){
+        Milestone ownerMilestone =
+                system.getMilestoneDatabase().getMilestoneByTicketId(ticket.getId());
+
+        if (ownerMilestone == null || ownerMilestone.getAssignedDevs() == null) {
             return false;
         }
         if (!ownerMilestone.getAssignedDevs().contains(developer.getUsername())) {
             return false;
         }
-        // Milestone is blocked
+
         if (ownerMilestone.isBlocked()) {
             return false;
         }
@@ -245,7 +253,8 @@ public class ManagerSearchStrategy implements SearchStrategy {
      * @param keywords
      * @return
      */
-    private boolean containsKeywords(Ticket ticket, ArrayList<String> keywords) {
+    private boolean containsKeywords(final Ticket ticket,
+                                     final ArrayList<String> keywords) {
         String content = (ticket.getTitle() + " " + ticket.getDescription()).toLowerCase();
         for (String k : keywords) {
             if (content.contains(k.toLowerCase()))  {
@@ -261,7 +270,8 @@ public class ManagerSearchStrategy implements SearchStrategy {
      * @param keywords
      * @return
      */
-    private List<String> getMatches(Ticket ticket, ArrayList<String> keywords) {
+    private List<String> getMatches(final Ticket ticket,
+                                    final ArrayList<String> keywords) {
         String content = (ticket.getTitle() + " " + ticket.getDescription()).toLowerCase();
         List<String> matches = new ArrayList<>();
         for (String keyword : keywords) {

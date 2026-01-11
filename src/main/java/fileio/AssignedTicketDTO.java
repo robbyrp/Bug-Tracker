@@ -33,7 +33,7 @@ public final class AssignedTicketDTO {
     private final String reportedBy;
     private final List<Comment> comments;
 
-    public AssignedTicketDTO(Ticket t) {
+    public AssignedTicketDTO(final Ticket t) {
         this.id = t.getId();
         this.type = t.getType();
         this.title = t.getTitle();

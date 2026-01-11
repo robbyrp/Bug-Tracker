@@ -80,7 +80,9 @@ public final class MilestoneManager {
 
         for (Integer ticketId : m.getTickets()) {
             Ticket t = ticketDatabase.getTicketById(ticketId);
-            if (t == null) continue;
+            if (t == null) {
+                continue;
+            }
 
             if (t.getStatus() == Status.CLOSED) {
                 m.getClosedTickets().add(ticketId);
@@ -164,12 +166,15 @@ public final class MilestoneManager {
                                    final UserDatabase userDatabase,
                                    final LocalDate currentDate) {
 
-        if (!m.getOpenTickets().isEmpty()) return;
+        if (!m.getOpenTickets().isEmpty()) {
+            return;
+        }
 
         Ticket lastTicket = findLastClosedTicket(m, ticketDatabase);
         int triggerTicketId = (lastTicket != null) ? lastTicket.getId() : -1;
 
-        List<Milestone> blockedMilestones = milestoneDatabase.getMilestonesByNames(m.getBlockingFor());
+        List<Milestone> blockedMilestones =
+                milestoneDatabase.getMilestonesByNames(m.getBlockingFor());
 
         for (Milestone blockedMilestone : blockedMilestones) {
             if (blockedMilestone.isBlocked()) {
@@ -177,13 +182,15 @@ public final class MilestoneManager {
                 blockedMilestone.setLastPriorityUpdateDate(currentDate);
 
                 if (currentDate.isAfter(blockedMilestone.getDueDate())) {
-                    String msg = "Milestone " + blockedMilestone.getName() +
-                            " was unblocked after due date. All active tickets are now CRITICAL.";
+                    String msg = "Milestone " + blockedMilestone.getName()
+                            + " was unblocked after due date. All active tickets are now CRITICAL.";
                     notifyDevs(blockedMilestone, userDatabase, msg);
                     forceCritical(blockedMilestone, ticketDatabase);
                 } else {
-                    String msg = "Milestone " + blockedMilestone.getName() +
-                            " is now unblocked as ticket " + triggerTicketId + " has been CLOSED.";
+                    String msg = "Milestone "
+                            + blockedMilestone.getName()
+                            + " is now unblocked as ticket "
+                            + triggerTicketId + " has been CLOSED.";
                     notifyDevs(blockedMilestone, userDatabase, msg);
                 }
             }
@@ -207,8 +214,8 @@ public final class MilestoneManager {
             m.setLastPriorityUpdateDate(m.getCreatedAt());
         }
 
-        // removed +1
-        int daysSinceLastUpdate = (int) ChronoUnit.DAYS.between(m.getLastPriorityUpdateDate(), currentDate);
+        int daysSinceLastUpdate =
+                (int) ChronoUnit.DAYS.between(m.getLastPriorityUpdateDate(), currentDate);
 
          if (daysSinceLastUpdate >= DAYS_BETWEEN_UPDATES) {
             incrementPriorities(m, ticketDatabase);
@@ -235,10 +242,13 @@ public final class MilestoneManager {
      * @param userDatabase
      * @param message
      */
-    private void notifyDevs(final Milestone m, final UserDatabase userDatabase, final String message) {
+    private void notifyDevs(final Milestone m, final UserDatabase userDatabase,
+                            final String message) {
         for (String username : m.getAssignedDevs()) {
-            User u = userDatabase.getUsers().get(username);
-            if (u != null) u.update(message);
+            User user = userDatabase.getUsers().get(username);
+            if (user != null)  {
+                user.update(message);
+            }
         }
     }
 
@@ -249,7 +259,7 @@ public final class MilestoneManager {
      * @param ticketDatabase
      */
     private void forceCritical(final Milestone m, final TicketDatabase ticketDatabase) {
-        for(Integer id : m.getTickets()) {
+        for (Integer id : m.getTickets()) {
             Ticket t = ticketDatabase.getTicketById(id);
             if (t != null) {
                 boolean ticketClosed = t.getStatus().equals(Status.CLOSED);
@@ -268,16 +278,19 @@ public final class MilestoneManager {
      * @param ticketDatabase
      */
     private void incrementPriorities(final Milestone m, final TicketDatabase ticketDatabase) {
-        for(Integer id : m.getTickets()) {
+        for (Integer id : m.getTickets()) {
             Ticket t = ticketDatabase.getTicketById(id);
             if (t == null) {
                 continue;
             }
-            switch(t.getBusinessPriority()) {
+            switch (t.getBusinessPriority()) {
 
                 case LOW -> t.setBusinessPriority(BusinessPriority.MEDIUM);
                 case MEDIUM -> t.setBusinessPriority(BusinessPriority.HIGH);
                 case HIGH -> t.setBusinessPriority(BusinessPriority.CRITICAL);
+                default -> {
+                    return;
+                }
             }
         }
     }
@@ -290,7 +303,7 @@ public final class MilestoneManager {
      */
     private Ticket findLastClosedTicket(final Milestone m, final TicketDatabase ticketDatabase) {
         Ticket last = null;
-        for(Integer id : m.getTickets()) {
+        for (Integer id : m.getTickets()) {
             Ticket t = ticketDatabase.getTicketById(id);
             if (t != null && t.getSolvedAt() != null) {
                 if (last == null || t.getSolvedAt().isAfter(last.getSolvedAt())) {
@@ -300,7 +313,4 @@ public final class MilestoneManager {
         }
         return last;
     }
-
-    //TODO: Dacă un tichet este redeschis dintr-un milestone anterior blocant,
-    // milestone-urile deblocate ramân deblocate.
 }
