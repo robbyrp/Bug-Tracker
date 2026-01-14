@@ -7,8 +7,21 @@ import java.util.List;
 import java.util.Objects;
 
 public final class MilestoneDatabase {
+    private static MilestoneDatabase instance;
     @Getter
     private List<Milestone> milestoneList = new ArrayList<>();
+
+    /**
+     * Singleton getInstance method
+     * @return
+     */
+    public static MilestoneDatabase getInstance() {
+        if (instance == null) {
+            return new MilestoneDatabase();
+        }
+        return instance;
+    }
+    private MilestoneDatabase() { }
 
     /**
      * Adds a milestone to the list

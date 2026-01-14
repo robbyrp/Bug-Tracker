@@ -46,7 +46,8 @@ public final class App {
 
             InputLoader inputLoader = new InputLoader(inputPath);
             List<CommandInput> commands = inputLoader.getCommands();
-            BugTrackerSystem system = new BugTrackerSystem();
+
+            BugTrackerSystem system = BugTrackerSystem.getInstance();
 
             system.getUserDatabase().initialize(userInputs);
 

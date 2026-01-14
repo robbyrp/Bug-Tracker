@@ -8,13 +8,28 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 public final class DateManager {
-
+    @JsonIgnore
+    private static DateManager instance;
     @Getter
     private ApplicationPhase currentPhase = ApplicationPhase.TESTING;
     @JsonIgnore
     private LocalDate lastTestingStartDate = null;
     @JsonIgnore
     private static final int TESTING_PHASE_DURATION = 12;
+
+
+    private DateManager() { }
+
+    /**
+     * Singleton getInstance method
+     * @return
+     */
+    public static DateManager getInstance() {
+        if (instance == null) {
+            return new DateManager();
+        }
+        return instance;
+    }
 
     /**
      * Method called at every command to verify testing phase

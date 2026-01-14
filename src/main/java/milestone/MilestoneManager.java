@@ -14,9 +14,24 @@ import java.util.Collections;
 import java.util.List;
 
 public final class MilestoneManager {
+    private static MilestoneManager instance;
+
     private static final int DAYS_BETWEEN_UPDATES = 3;
     private static final double MAX_COMPL_PERCENTAGE = 1.0;
     private static final double ROUNDING_VALUE = 100.0;
+
+    private MilestoneManager() { }
+
+    /**
+     * Singleton getInstance method
+     * @return
+     */
+    public static MilestoneManager getInstance() {
+        if (instance == null) {
+            return new MilestoneManager();
+        }
+        return instance;
+    }
 
     /**
      * Main method, called from BugTrackerSystem

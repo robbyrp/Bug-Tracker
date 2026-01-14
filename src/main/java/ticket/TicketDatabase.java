@@ -6,8 +6,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class TicketDatabase {
+    private static TicketDatabase instance;
     @Getter
     private List<Ticket> tickets = new ArrayList<>();
+
+    private TicketDatabase() { }
+
+    /**
+     * Singleton getInstance method
+     * @return
+     */
+    public static TicketDatabase getInstance() {
+        if (instance == null) {
+            return new TicketDatabase();
+        }
+        return instance;
+    }
 
     /**
      * adds a ticket to the list

@@ -33,6 +33,7 @@ import lombok.Getter;
 import lombok.Setter;
 import milestone.MilestoneDatabase;
 import milestone.MilestoneManager;
+import ticket.Bug;
 import ticket.TicketDatabase;
 import user.User;
 import user.UserDatabase;
@@ -44,15 +45,24 @@ import java.util.List;
 
 @Getter
 public final class BugTrackerSystem {
-    private UserDatabase userDatabase = new UserDatabase();
-    private TicketDatabase ticketDatabase = new TicketDatabase();
-    private MilestoneDatabase milestoneDatabase = new MilestoneDatabase();
-    private MilestoneManager milestoneManager = new MilestoneManager();
-    private DateManager dateManager = new DateManager();
+    private final UserDatabase userDatabase = UserDatabase.getInstance();
+    private final TicketDatabase ticketDatabase = TicketDatabase.getInstance();
+    private final MilestoneDatabase milestoneDatabase = MilestoneDatabase.getInstance();
+    private final MilestoneManager milestoneManager = MilestoneManager.getInstance();
+    private final DateManager dateManager = DateManager.getInstance();
 
+    private static BugTrackerSystem instance;
     @Setter
     private boolean activeStatus = true;
 
+    private BugTrackerSystem() { }
+
+    public static BugTrackerSystem getInstance() {
+        if (instance == null) {
+            return new BugTrackerSystem();
+        }
+        return instance;
+    }
     /**
      * Method that calls the execute method() from the command pattern
      * After validating the username and permissions
@@ -149,6 +159,13 @@ public final class BugTrackerSystem {
         return true;
     }
 
+    /**
+     * Private method that validates the Phase of execution
+     * @param input
+     * @param command
+     * @param outputs
+     * @return
+     */
     private boolean validatePhasePermission(final CommandInput input, final Command command,
                                             final List<ObjectNode> outputs) {
         ApplicationPhase requiredPhase = command.getRequiredPhase();

@@ -42,7 +42,6 @@ public final class StartTestingPhaseCommand extends Command {
 
         for (Milestone milestone : system.getMilestoneDatabase().getMilestoneList()) {
             if (milestone.getStatus().equals(MilestoneStatus.ACTIVE)) {
-                 System.out.println("DEBUG: Milestone activ blocant: " + milestone.getName());
                 String error = "Cannot start a new testing phase.";
                 outputs.add(OutputFormatter.createError(
                         getCommandInput().getCommand(),
