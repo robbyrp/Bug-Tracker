@@ -33,7 +33,6 @@ import lombok.Getter;
 import lombok.Setter;
 import milestone.MilestoneDatabase;
 import milestone.MilestoneManager;
-import ticket.Bug;
 import ticket.TicketDatabase;
 import user.User;
 import user.UserDatabase;
@@ -43,7 +42,7 @@ import utils.DateManager;
 import java.time.LocalDate;
 import java.util.List;
 
-@Getter
+@Setter @Getter
 public final class BugTrackerSystem {
     private final UserDatabase userDatabase = UserDatabase.getInstance();
     private final TicketDatabase ticketDatabase = TicketDatabase.getInstance();
@@ -52,7 +51,6 @@ public final class BugTrackerSystem {
     private final DateManager dateManager = DateManager.getInstance();
 
     private static BugTrackerSystem instance;
-    @Setter
     private boolean activeStatus = true;
 
     private BugTrackerSystem() { }
@@ -189,6 +187,13 @@ public final class BugTrackerSystem {
         ));
         return false;
     }
+
+    /**
+     * Factory method that returns the correct Command class
+     * @param input
+     * @param user
+     * @return
+     */
     private Command getCommandFromInput(final CommandInput input, final User user) {
         return switch (input.getCommand()) {
             case "reportTicket" -> new ReportTicketCommand(input, user);

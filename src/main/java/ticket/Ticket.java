@@ -104,7 +104,6 @@ public class Ticket {
         this.history = t.history;
     }
 
-    // T represents the future builder(inner class) of Ticket's children, for example Bug.BugBuilder
     public abstract static class Builder<T extends Builder<T>> {
         private int id;
         private TicketType type;
@@ -119,7 +118,7 @@ public class Ticket {
         private String description;
 
         /**
-         * Making self abstract in the parent class avoids
+         * Making self() abstract in the parent class avoids
          * the unchecked cast of (T) this;
          * @return the child's inner builder class, for example Bug.BugBuilder
          */

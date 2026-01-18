@@ -1,4 +1,4 @@
-The four main design patterns that I used are : Factory, Builder, Command and Strategu
+The four main design patterns that I used are : Factory, Builder, Command and Strategy
 
 
 For the ticket class and inheritance line, I have used a builder pattern with generics
@@ -9,10 +9,10 @@ For the users hierarchy, I've seen no reason to implement builder as there are t
 
 For the commands, I chose to implement the command pattern, with the help of an abstract class instead of interface. 
 This decision came after seeing that every Command class had the same 2 fields. 
+
 But the commands system is a bit more complicated.
-There are exceptions associated with the restrictions that are validated before executing the commands.
-The command abstract class contains GetRequiredRoles() and GetRequiredPhase() methods
-that are to be overwritten by Command classes that have restrictions. Moreover, the commands
+
+Moreover, the commands
 that can be executed by More than one Role are implemented with the Strategy Pattern. Each of these commands
 has a strategy interface, which is implemented by the concrete strategies, and a context(for example viewTicketsCommand).
 The context uses a factory to set the strategy and then implements the execute and/or undo method, and it can override the
