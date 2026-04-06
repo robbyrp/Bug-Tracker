@@ -1,8 +1,15 @@
+### Maven ###
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-.kotlin
+
+### Spring Boot ###
+*.log
+
+### Project Specific ###
+ref/
+out/
 
 ### IntelliJ IDEA ###
 .idea/
@@ -32,7 +39,6 @@ build/
 ### VS Code ###
 .vscode/
 
-### Mac OS ###
+### Mac OS / Linux ###
 .DS_Store
-
-out/
+*~

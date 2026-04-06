@@ -1,0 +1,20 @@
+package com.bugtracker.user;
+
+import com.bugtracker.fileio.UserInput;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.ArrayList;
+
+@Getter @Setter
+public final class Manager extends User {
+    private String hireDate;
+    private ArrayList<String> subordinates;
+
+    public Manager(final UserInput input) {
+        super(input);
+        this.hireDate = input.getHireDate();
+        this.subordinates = input.getSubordinates();
+    }
+
+}
