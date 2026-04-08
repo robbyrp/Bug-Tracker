@@ -35,6 +35,15 @@ Once the application is running, open your browser and navigate to:
 5. `command.execute()` invokes the specific logic, modifying the system state and appending the formatted result to the JSON output list returned to the client.
 6. The controller logic in the endpoints is very simple, as all the heavy work is done by the Command Pattern.
 
+
+## Structure
+* **Custom Exception Handling** 
+* **Smart Enums** 
+* **Data Transfer Objects (DTOs)**
+* **Dynamic JSON Processing**
+* **Functional Programming** 
+
+
 # OOP
 
 - **Singleton:** Used to implement the databases and the engine class (`BugTrackerSystem`)
@@ -43,10 +52,3 @@ Once the application is running, open your browser and navigate to:
 - **Strategy:** Commands that can be executed differently by multiple types of users (e.g., Developer vs. Reporter) use the strategy pattern. Multiple contexts contain factories to decide which concrete strategy to use at runtime.
 - **Factory:** Used for the creation of `Ticket` and `User` objects, and for returning the correct `Command` class after reading the command name from the API input.
 - **Observer:** A simplified implementation is used in the notification logic (the `Subscriber` interface implemented by Users, updated by the `MilestoneManager`).
-
-## Structure
-* **Custom Exception Handling** 
-* **Smart Enums** 
-* **Data Transfer Objects (DTOs)**
-* **Dynamic JSON Processing**
-* **Functional Programming** 
