@@ -1,7 +1,6 @@
 # Bug Tracker REST API
 
 A backend application built with **Spring Boot 3.4** for managing developer workflows, bug reporting, and developer assignments. 
-This project implements a stateful system using Object-Oriented Programming principles and structural design patterns.
 
 ### Prerequisites
 * Java 17 or higher
@@ -46,9 +45,9 @@ Once the application is running, open your browser and navigate to:
 
 # OOP
 
-- **Singleton:** Used to implement the databases and the engine class (`BugTrackerSystem`)
+- **Command:** Leveraged the Command Pattern in order to decouple the business logic from the Spring Web Controller.
+- **Singleton:** Used to implement the databases and the engine class (`BugTrackerSystem`).
 - **Builder:** Heavily utilized for entities with optional fields. An interesting challenge was inheriting builder fields; the solution involved using a **generic abstract builder** inside the `Ticket` parent class, which was then extended by the children's builders.
-- **Command:** The command abstract class handles pre-execution validations (like `getRequiredRoles()` and `getRequiredPhase()`).
 - **Strategy:** Commands that can be executed differently by multiple types of users (e.g., Developer vs. Reporter) use the strategy pattern. Multiple contexts contain factories to decide which concrete strategy to use at runtime.
 - **Factory:** Used for the creation of `Ticket` and `User` objects, and for returning the correct `Command` class after reading the command name from the API input.
 - **Observer:** A simplified implementation is used in the notification logic (the `Subscriber` interface implemented by Users, updated by the `MilestoneManager`).
